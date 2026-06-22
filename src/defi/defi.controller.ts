@@ -431,6 +431,3 @@ export class DeFiController {
     return alerts;
   }
 }
-
-
-

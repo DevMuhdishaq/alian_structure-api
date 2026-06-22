@@ -124,6 +124,3 @@ export class DeFiYieldStrategy {
   @UpdateDateColumn()
   updated_at: Date;
 }
-
-
-

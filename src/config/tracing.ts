@@ -78,6 +78,3 @@ export const createSpan = async <T>(
     }
   });
 };
-
-
-

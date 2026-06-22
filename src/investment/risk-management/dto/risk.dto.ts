@@ -85,6 +85,3 @@ export class PositionSizeDto {
   @Min(0)
   volatility: number;
 }
-
-
-

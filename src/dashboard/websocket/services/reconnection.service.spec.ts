@@ -220,6 +220,3 @@ describe("Exponential Backoff", () => {
     expect(currentDelay).toBe(30000);
   });
 });
-
-
-

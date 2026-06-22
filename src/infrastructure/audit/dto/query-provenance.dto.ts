@@ -132,6 +132,3 @@ export class ExportProvenanceDto {
   @IsString()
   format?: "json" | "csv" = "json";
 }
-
-
-

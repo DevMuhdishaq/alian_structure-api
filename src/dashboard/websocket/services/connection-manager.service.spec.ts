@@ -284,6 +284,3 @@ describe("ConnectionManagerService", () => {
     });
   });
 });
-
-
-

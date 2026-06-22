@@ -251,6 +251,3 @@ export class AppModule implements NestModule, OnModuleInit {
     this.verifier.start();
   }
 }
-
-
-

@@ -81,6 +81,3 @@ export class PortfolioResponseDto {
   createdAt: Date;
   updatedAt: Date;
 }
-
-
-

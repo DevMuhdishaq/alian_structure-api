@@ -127,6 +127,3 @@ export class PortfolioAssetResponseDto {
   unrealizedGain?: number;
   updatedAt: Date;
 }
-
-
-

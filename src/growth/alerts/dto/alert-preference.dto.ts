@@ -80,6 +80,3 @@ export class UnsubscribeAlertDto {
   @IsString()
   userId: string;
 }
-
-
-

@@ -48,6 +48,3 @@ export class ProvenanceAccessGuard implements CanActivate {
     return true;
   }
 }
-
-
-

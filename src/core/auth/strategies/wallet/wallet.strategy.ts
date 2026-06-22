@@ -131,6 +131,3 @@ export class WalletStrategy implements AuthStrategy {
     }
   }
 }
-
-
-

@@ -45,6 +45,3 @@ export class SanitizePipe implements PipeTransform {
     );
   }
 }
-
-
-

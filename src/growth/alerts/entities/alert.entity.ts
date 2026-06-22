@@ -57,6 +57,3 @@ export class Alert {
   @UpdateDateColumn()
   updatedAt: Date;
 }
-
-
-

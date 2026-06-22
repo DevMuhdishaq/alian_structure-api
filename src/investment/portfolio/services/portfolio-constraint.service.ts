@@ -241,6 +241,3 @@ export class PortfolioConstraintService {
     return maxAllocation > 0.5 ? (maxAllocation - 0.5) * 40 : 0;
   }
 }
-
-
-

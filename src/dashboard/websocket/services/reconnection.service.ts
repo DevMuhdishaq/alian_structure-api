@@ -536,6 +536,3 @@ export class WebSocketClientManager {
     });
   }
 }
-
-
-

@@ -482,6 +482,3 @@ export class ModernPortfolioTheory {
     }
   }
 }
-
-
-

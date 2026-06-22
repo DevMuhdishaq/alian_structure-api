@@ -177,6 +177,3 @@ export class ComparisonResponseDto {
   timestamp: Date;
   calculationDate: Date;
 }
-
-
-

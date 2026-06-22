@@ -298,6 +298,3 @@ describe("PerformanceCalculations", () => {
     });
   });
 });
-
-
-

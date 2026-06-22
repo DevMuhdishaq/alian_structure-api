@@ -279,6 +279,3 @@ export class OAuthStrategy implements AuthStrategy {
     }
   }
 }
-
-
-

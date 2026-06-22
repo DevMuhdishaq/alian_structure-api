@@ -593,6 +593,3 @@ export interface RiskPosition {
   riskLevel: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   hoursToLiquidation?: number;
 }
-
-
-

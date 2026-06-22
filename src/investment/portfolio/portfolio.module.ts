@@ -25,6 +25,7 @@ import { TradingTransactionService } from "./services/trading-transaction.servic
 // Controllers
 import { PortfolioController } from "./portfolio.controller";
 import { PortfolioManagementController } from "./portfolio-management.controller";
+import { TransactionController } from "./controllers/transaction.controller";
 import { PortfolioOwnerGuard } from "./guards/portfolio-owner.guard";
 
 @Module({
@@ -68,7 +69,11 @@ import { PortfolioOwnerGuard } from "./guards/portfolio-owner.guard";
     TradingTransactionService,
     PortfolioOwnerGuard,
   ],
-  controllers: [PortfolioController, PortfolioManagementController],
+  controllers: [
+    PortfolioController,
+    PortfolioManagementController,
+    TransactionController,
+  ],
 
   exports: [
     PortfolioService,
@@ -81,6 +86,3 @@ import { PortfolioOwnerGuard } from "./guards/portfolio-owner.guard";
   ],
 })
 export class PortfolioModule {}
-
-
-

@@ -408,6 +408,3 @@ describe("WalletAuthService", () => {
     });
   });
 });
-
-
-

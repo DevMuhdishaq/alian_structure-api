@@ -251,6 +251,3 @@ export class PayloadSigningService {
     return payloadHash;
   }
 }
-
-
-

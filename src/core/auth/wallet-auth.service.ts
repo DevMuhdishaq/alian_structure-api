@@ -550,6 +550,3 @@ export class WalletAuthService {
     };
   }
 }
-
-
-

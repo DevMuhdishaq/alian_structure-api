@@ -178,6 +178,3 @@ export class TraditionalStrategy implements AuthStrategy {
     }
   }
 }
-
-
-

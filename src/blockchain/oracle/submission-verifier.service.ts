@@ -150,6 +150,3 @@ export class SubmissionVerifierService {
     };
   }
 }
-
-
-

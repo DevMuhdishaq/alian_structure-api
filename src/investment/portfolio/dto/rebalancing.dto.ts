@@ -82,6 +82,3 @@ export class RebalancingEventResponseDto {
   executedAt?: Date;
   completedAt?: Date;
 }
-
-
-

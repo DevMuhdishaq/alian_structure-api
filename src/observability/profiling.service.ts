@@ -267,6 +267,3 @@ export class ProfilingService {
     };
   }
 }
-
-
-

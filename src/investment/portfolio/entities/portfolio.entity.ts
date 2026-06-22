@@ -133,6 +133,3 @@ export class Portfolio {
   })
   performanceMetrics: PerformanceMetric[];
 }
-
-
-

@@ -635,6 +635,3 @@ export class PortfolioService {
     await this.portfolioRepository.delete(portfolioId);
   }
 }
-
-
-

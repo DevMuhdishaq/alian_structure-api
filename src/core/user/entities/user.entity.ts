@@ -99,6 +99,3 @@ export class User {
   @OneToMany(() => User, (user) => user.referredBy)
   referrals: User[];
 }
-
-
-

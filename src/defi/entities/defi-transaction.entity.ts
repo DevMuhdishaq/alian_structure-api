@@ -100,6 +100,3 @@ export class DeFiTransaction {
   @Column("timestamp", { nullable: true })
   executed_at: Date;
 }
-
-
-

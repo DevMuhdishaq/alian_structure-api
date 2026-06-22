@@ -159,6 +159,3 @@ export class ProvenanceRecord {
   @Column({ type: "text", nullable: true })
   userAgent: string | null;
 }
-
-
-

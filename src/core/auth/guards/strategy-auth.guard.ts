@@ -136,6 +136,3 @@ export class StrategyAuthGuard implements CanActivate {
     };
   }
 }
-
-
-

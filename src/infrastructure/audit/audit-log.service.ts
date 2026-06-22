@@ -22,6 +22,3 @@ export class AuditLogService {
     return this.logs.slice(-limit);
   }
 }
-
-
-
