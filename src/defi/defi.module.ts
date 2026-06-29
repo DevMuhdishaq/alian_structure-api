@@ -15,6 +15,7 @@ import { PositionTrackingService } from "./services/position-tracking.service";
 import { YieldOptimizationService } from "./services/yield-optimization.service";
 import { RiskAssessmentService } from "./services/risk-assessment.service";
 import { TransactionOptimizationService } from "./services/transaction-optimization.service";
+import { StakingService } from "./services/staking.service";
 
 // Protocol Adapters
 import { AaveAdapter } from "./protocols/aave.adapter";
@@ -103,6 +104,7 @@ import { TradeLockService } from "./trade-lock.service";
     RiskAssessmentService,
     TransactionOptimizationService,
     TradeLockService,
+    StakingService,
   ],
   controllers: [DeFiController, TradeController],
   exports: [
@@ -112,6 +114,7 @@ import { TradeLockService } from "./trade-lock.service";
     RiskAssessmentService,
     TransactionOptimizationService,
     TradeLockService,
+    StakingService,
   ],
 })
 export class DeFiModule implements OnModuleInit {

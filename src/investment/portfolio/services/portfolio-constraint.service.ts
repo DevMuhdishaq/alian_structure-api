@@ -93,14 +93,33 @@ export class PortfolioConstraintService {
         );
       }
 
+      const categoryErrorThreshold =
+        config.maxCategoryAllocation *
+        (2 - config.warningThresholdPercent / 100);
+
       for (const [category, allocation] of categoryAllocations.entries()) {
-        if (allocation > config.maxCategoryAllocation) {
+        if (allocation > categoryErrorThreshold) {
           violations.push({
             code: "MAX_CATEGORY_ALLOCATION_EXCEEDED",
             severity: "error",
             message: `${category} allocation (${allocation.toFixed(
               2,
             )}%) exceeds the max category allocation of ${
+              config.maxCategoryAllocation
+            }%.`,
+            details: {
+              category,
+              allocation,
+              limit: config.maxCategoryAllocation,
+            },
+          });
+        } else if (allocation > config.maxCategoryAllocation) {
+          warnings.push({
+            code: "CATEGORY_ALLOCATION_NEAR_LIMIT",
+            severity: "warning",
+            message: `${category} allocation (${allocation.toFixed(
+              2,
+            )}%) is approaching the max category allocation of ${
               config.maxCategoryAllocation
             }%.`,
             details: {
@@ -205,9 +224,14 @@ export class PortfolioConstraintService {
       totalValue,
     );
 
+    const categoryPenalty = this.getCategoryConcentrationPenalty(
+      assets,
+      totalValue,
+    );
+
     return Math.min(
       100,
-      Number((weightedRisk + concentrationPenalty).toFixed(2)),
+      Number((weightedRisk + concentrationPenalty + categoryPenalty).toFixed(2)),
     );
   }
 
@@ -239,5 +263,21 @@ export class PortfolioConstraintService {
     );
 
     return maxAllocation > 0.5 ? (maxAllocation - 0.5) * 40 : 0;
+  }
+
+  private getCategoryConcentrationPenalty(
+    assets: PortfolioAsset[],
+    totalValue: number,
+  ): number {
+    const categoryWeights = new Map<AssetType, number>();
+    for (const asset of assets) {
+      categoryWeights.set(
+        asset.type,
+        (categoryWeights.get(asset.type) || 0) +
+          Number(asset.value || 0) / totalValue,
+      );
+    }
+    const maxCategoryWeight = Math.max(...categoryWeights.values());
+    return maxCategoryWeight > 0.5 ? (maxCategoryWeight - 0.5) * 30 : 0;
   }
 }

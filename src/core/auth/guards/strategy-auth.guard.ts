@@ -122,6 +122,7 @@ export class StrategyAuthGuard implements CanActivate {
     email?: string;
     username?: string;
     role: string;
+    tier?: string;
     roles: string[];
     type: string;
   } {
@@ -131,8 +132,11 @@ export class StrategyAuthGuard implements CanActivate {
       email: payload.email,
       username: payload.username,
       role: payload.role,
+      tier: payload.tier,
       roles: payload.roles || [payload.role],
       type: payload.type,
     };
   }
 }
+
+
