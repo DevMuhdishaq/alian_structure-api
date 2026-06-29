@@ -281,6 +281,3 @@ export class DatabaseIndexService {
     }
   }
 }
-
-
-

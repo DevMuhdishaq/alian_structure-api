@@ -252,6 +252,3 @@ export class OracleController {
     };
   }
 }
-
-
-

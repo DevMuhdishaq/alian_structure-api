@@ -137,4 +137,3 @@ export const QUOTA_LEVELS: Record<string, QuotaConfig> = {
 };
 
 export const DEFAULT_QUOTA = QUOTA_LEVELS.free;
-

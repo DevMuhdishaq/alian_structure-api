@@ -697,6 +697,3 @@ export class SubmitterService {
     };
   }
 }
-
-
-

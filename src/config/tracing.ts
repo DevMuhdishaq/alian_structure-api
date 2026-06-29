@@ -128,7 +128,6 @@ export const createSpan = async <T>(
     }
   });
 };
-
 /**
  * Extract trace context from an incoming carrier (HTTP headers, WS handshake
  * headers, message metadata, etc.) and return an active context so that child

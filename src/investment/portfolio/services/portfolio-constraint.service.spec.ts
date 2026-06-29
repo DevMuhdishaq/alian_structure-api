@@ -246,6 +246,3 @@ describe("PortfolioConstraintService", () => {
     ).toBe(true);
   });
 });
-
-
-

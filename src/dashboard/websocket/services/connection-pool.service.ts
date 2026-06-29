@@ -420,6 +420,3 @@ export class ConnectionPoolService implements OnModuleDestroy {
     this.logger.log("Connection pool service shut down");
   }
 }
-
-
-

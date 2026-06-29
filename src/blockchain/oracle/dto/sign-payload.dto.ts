@@ -15,6 +15,3 @@ export class SignPayloadDto {
   })
   privateKey: string;
 }
-
-
-

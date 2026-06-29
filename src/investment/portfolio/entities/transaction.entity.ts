@@ -22,7 +22,14 @@ export enum TransactionType {
   REBALANCE = "rebalance",
   DIVIDEND = "dividend",
   INTEREST = "interest",
+  STAKE = "stake",
+  UNSTAKE = "unstake",
   OTHER = "other",
+}
+
+export enum TransactionStatus {
+  ACTIVE = "active",
+  ARCHIVED = "archived",
 }
 
 @Entity("transactions")
@@ -53,6 +60,15 @@ export class Transaction {
   fees: number;
 
   @Column({
+    type: "decimal",
+    precision: 18,
+    scale: 8,
+    nullable: true,
+    comment: "Gas fees, specific to blockchain transactions",
+  })
+  gasFees: number;
+
+  @Column({
     type: "enum",
     enum: Chain,
     default: Chain.OTHER,
@@ -64,6 +80,13 @@ export class Transaction {
 
   @Column({ type: "jsonb", nullable: true })
   metadata: Record<string, any>;
+
+  @Column({
+    type: "enum",
+    enum: TransactionStatus,
+    default: TransactionStatus.ACTIVE,
+  })
+  status: TransactionStatus;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -85,6 +108,3 @@ export class Transaction {
   @Column("uuid", { nullable: true })
   portfolioAssetId: string | null;
 }
-
-
-

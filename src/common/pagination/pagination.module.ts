@@ -6,6 +6,3 @@ import { CursorPaginationService } from "./cursor-pagination.service";
   exports: [CursorPaginationService],
 })
 export class PaginationModule {}
-
-
-

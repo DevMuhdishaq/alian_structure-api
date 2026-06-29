@@ -26,6 +26,3 @@ import { HEALTH_REDIS_CLIENT } from "./health.constants";
   ],
 })
 export class HealthModule {}
-
-
-

@@ -46,6 +46,3 @@ import { AuditModule } from "src/infrastructure/audit/audit.module";
   ],
 })
 export class OracleModule {}
-
-
-

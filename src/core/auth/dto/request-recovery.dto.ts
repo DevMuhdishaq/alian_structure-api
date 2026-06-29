@@ -4,6 +4,3 @@ export class RequestRecoveryDto {
   @IsEmail()
   email: string;
 }
-
-
-

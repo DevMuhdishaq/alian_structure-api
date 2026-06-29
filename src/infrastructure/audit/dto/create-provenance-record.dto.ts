@@ -130,6 +130,3 @@ export class CreateProvenanceRecordDto {
   @IsString()
   userAgent?: string;
 }
-
-
-

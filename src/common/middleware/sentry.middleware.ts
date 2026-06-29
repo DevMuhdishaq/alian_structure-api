@@ -25,6 +25,3 @@ export const sentryBreadcrumbMiddleware = (
 
   next();
 };
-
-
-

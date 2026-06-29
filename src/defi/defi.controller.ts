@@ -491,6 +491,3 @@ export class DeFiController {
     return this.stakingService.getStakingOpportunities(tokenList);
   }
 }
-
-
-

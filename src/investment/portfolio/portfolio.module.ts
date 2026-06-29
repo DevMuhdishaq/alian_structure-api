@@ -32,6 +32,7 @@ import { RebalancingProcessor } from "./processors/rebalancing.processor";
 // Controllers
 import { PortfolioController } from "./portfolio.controller";
 import { PortfolioManagementController } from "./portfolio-management.controller";
+import { TransactionController } from "./controllers/transaction.controller";
 import { PortfolioOwnerGuard } from "./guards/portfolio-owner.guard";
 
 @Module({
@@ -78,7 +79,11 @@ import { PortfolioOwnerGuard } from "./guards/portfolio-owner.guard";
     PortfolioOwnerGuard,
     RebalancingProcessor,
   ],
-  controllers: [PortfolioController, PortfolioManagementController],
+  controllers: [
+    PortfolioController,
+    PortfolioManagementController,
+    TransactionController,
+  ],
 
   exports: [
     PortfolioService,

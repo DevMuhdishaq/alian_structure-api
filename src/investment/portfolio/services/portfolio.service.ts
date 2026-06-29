@@ -650,6 +650,3 @@ export class PortfolioService {
     });
   }
 }
-
-
-

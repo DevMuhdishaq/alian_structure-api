@@ -491,6 +491,3 @@ export interface CompoundingResult {
     value: number;
   }>;
 }
-
-
-

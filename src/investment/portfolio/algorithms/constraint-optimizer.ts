@@ -133,6 +133,3 @@ export class ConstraintOptimizer {
     return w;
   }
 }
-
-
-

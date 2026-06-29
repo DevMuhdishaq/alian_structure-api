@@ -141,6 +141,3 @@ export class SignedPayload {
   @Column({ type: "timestamp", nullable: true })
   confirmedAt: Date | null;
 }
-
-
-

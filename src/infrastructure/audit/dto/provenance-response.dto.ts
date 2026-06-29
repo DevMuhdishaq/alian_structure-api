@@ -205,6 +205,3 @@ export class ProvenanceTimelineResponseDto {
   })
   toDate: string;
 }
-
-
-

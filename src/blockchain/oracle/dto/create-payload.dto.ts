@@ -36,6 +36,3 @@ export class CreatePayloadDto {
   @IsOptional()
   metadata?: Record<string, any>;
 }
-
-
-

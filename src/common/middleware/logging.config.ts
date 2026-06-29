@@ -72,6 +72,3 @@ export const DEFAULT_LOGGING_CONFIG: Required<LoggingMiddlewareConfig> = {
 };
 
 export const REQUEST_ID_HEADER = "x-request-id";
-
-
-

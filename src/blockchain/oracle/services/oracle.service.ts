@@ -393,6 +393,3 @@ export class OracleService {
     };
   }
 }
-
-
-

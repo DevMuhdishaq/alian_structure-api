@@ -82,6 +82,3 @@ export class OptimizationHistoryResponseDto {
   completedAt?: Date;
   implementedAt?: Date;
 }
-
-
-

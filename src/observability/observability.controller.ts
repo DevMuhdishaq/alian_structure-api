@@ -131,6 +131,3 @@ export class ObservabilityController {
     return register.metrics();
   }
 }
-
-
-

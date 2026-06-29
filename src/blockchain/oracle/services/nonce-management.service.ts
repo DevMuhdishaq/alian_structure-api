@@ -267,6 +267,3 @@ export class NonceManagementService {
     return deletedCount;
   }
 }
-
-
-

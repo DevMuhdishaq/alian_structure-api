@@ -246,6 +246,3 @@ export class EnhancedAuthController {
     return this.enhancedAuthService.getTwoFactorStatus(req.user.sub);
   }
 }
-
-
-

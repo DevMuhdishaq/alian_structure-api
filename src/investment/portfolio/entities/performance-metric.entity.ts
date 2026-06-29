@@ -131,6 +131,3 @@ export class PerformanceMetric {
   @Column("uuid")
   portfolioId: string;
 }
-
-
-
