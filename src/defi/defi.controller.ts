@@ -16,6 +16,7 @@ import { PositionTrackingService } from "./services/position-tracking.service";
 import { YieldOptimizationService } from "./services/yield-optimization.service";
 import { RiskAssessmentService } from "./services/risk-assessment.service";
 import { TransactionOptimizationService } from "./services/transaction-optimization.service";
+import { StakingService } from "./services/staking.service";
 import {
   CreateDeFiPositionDto,
   UpdateDeFiPositionDto,
@@ -34,6 +35,11 @@ import {
   CompoundRewardsDto,
   StrategyPerformanceDto,
 } from "./dto/yield-strategy.dto";
+import {
+  StakeDto,
+  UnstakeDto,
+  AutoCompoundConfigDto,
+} from "./dto/staking.dto";
 import { JwtAuthGuard } from "src/core/auth/jwt.guard";
 import { User } from "src/core/user/entities/user.entity";
 import { CurrentUser } from "src/core/auth/decorators";
@@ -51,6 +57,7 @@ export class DeFiController {
     private riskAssessmentService: RiskAssessmentService,
     private transactionOptimizationService: TransactionOptimizationService,
     private protocolRegistry: ProtocolRegistry,
+    private stakingService: StakingService,
   ) {}
 
   // ==================== Protocols ====================
@@ -429,6 +436,59 @@ export class DeFiController {
     }
 
     return alerts;
+  }
+
+  // ==================== Staking ====================
+
+  @Get("staking")
+  async getStakingPositions(@CurrentUser() user: User) {
+    return this.stakingService.getStakingPositions(user.id);
+  }
+
+  @Post("staking")
+  @HttpCode(HttpStatus.CREATED)
+  async stake(@CurrentUser() user: User, @Body() dto: StakeDto) {
+    return this.stakingService.stake(user.id, dto);
+  }
+
+  @Post("staking/:positionId/unstake")
+  async unstake(
+    @CurrentUser() user: User,
+    @Param("positionId") positionId: string,
+    @Body() dto: UnstakeDto,
+  ) {
+    return this.stakingService.unstake(user.id, { ...dto, positionId });
+  }
+
+  @Post("staking/:positionId/claim")
+  async claimStakingRewards(
+    @CurrentUser() user: User,
+    @Param("positionId") positionId: string,
+  ) {
+    return this.stakingService.claimRewards(user.id, positionId);
+  }
+
+  @Post("staking/:positionId/compound")
+  async compoundStakingRewards(
+    @CurrentUser() user: User,
+    @Param("positionId") positionId: string,
+  ) {
+    return this.stakingService.autoCompound(user.id, positionId);
+  }
+
+  @Put("staking/:positionId/auto-compound")
+  async setAutoCompound(
+    @CurrentUser() user: User,
+    @Param("positionId") positionId: string,
+    @Body() dto: AutoCompoundConfigDto,
+  ) {
+    return this.stakingService.setAutoCompound(user.id, positionId, dto.enabled);
+  }
+
+  @Get("staking/opportunities")
+  async getStakingOpportunities(@Query("tokens") tokens: string) {
+    const tokenList = tokens ? tokens.split(",") : ["ETH", "stETH", "MATIC"];
+    return this.stakingService.getStakingOpportunities(tokenList);
   }
 }
 
