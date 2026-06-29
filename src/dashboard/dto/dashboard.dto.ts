@@ -20,3 +20,6 @@ export class TimeRangeDto {
   @IsEnum(TimeRange)
   timeRange?: TimeRange;
 }
+
+
+

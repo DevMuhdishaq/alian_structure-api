@@ -148,3 +148,6 @@ export class DeFiPosition {
   @Column("timestamp", { nullable: true })
   last_updated_on_chain: Date;
 }
+
+
+

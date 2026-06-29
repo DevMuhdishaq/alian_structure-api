@@ -536,3 +536,6 @@ export class AaveAdapter implements ProtocolAdapter {
     return prices[token] || 0;
   }
 }
+
+
+

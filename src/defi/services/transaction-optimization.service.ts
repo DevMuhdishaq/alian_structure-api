@@ -523,3 +523,6 @@ export interface NetworkConditions {
   networkCongestion: "low" | "moderate" | "high";
   avgBlockTime: number;
 }
+
+
+

@@ -49,3 +49,6 @@ export class PortfolioOwnerGuard implements CanActivate {
     return true;
   }
 }
+
+
+

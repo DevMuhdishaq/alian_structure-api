@@ -137,3 +137,6 @@ export class PortfolioListResponseDto {
   @ApiProperty({ type: [PortfolioResponseDto] })
   portfolios: PortfolioResponseDto[];
 }
+
+
+

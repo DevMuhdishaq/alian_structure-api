@@ -50,3 +50,6 @@ export class DeFiYieldRecord {
   @Column("boolean", { default: false })
   claimed: boolean;
 }
+
+
+

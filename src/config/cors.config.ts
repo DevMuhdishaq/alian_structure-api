@@ -22,3 +22,6 @@ export function createCorsConfig(configService: ConfigService): CorsOptions {
     maxAge: 3600,
   };
 }
+
+
+

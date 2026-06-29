@@ -10,7 +10,7 @@
     "target": "ES2021",
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": "./src",
     "baseUrl": "./",
     "types": ["node", "jest"],
     "moduleResolution": "node",
@@ -32,6 +32,6 @@
       "src/*": ["src/*"]
     }
   },
-  "include": ["src/**/*", "test/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "test"]
 }

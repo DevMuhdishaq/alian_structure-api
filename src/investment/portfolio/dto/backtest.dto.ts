@@ -65,3 +65,6 @@ export class BacktestResultResponseDto {
   createdAt: Date;
   completedAt?: Date;
 }
+
+
+

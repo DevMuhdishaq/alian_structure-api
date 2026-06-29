@@ -23,3 +23,6 @@ export class ApiErrorDto {
   @ApiProperty({ example: "/api/v1/portfolio/:id" })
   path: string;
 }
+
+
+

@@ -55,3 +55,6 @@ export function hasRole(candidate: Role, required: Role): boolean {
 
   return candidateIdx >= requiredIdx;
 }
+
+
+

@@ -8,3 +8,6 @@ export class RecoverWalletDto {
   @Length(64, 64)
   recoveryToken: string;
 }
+
+
+

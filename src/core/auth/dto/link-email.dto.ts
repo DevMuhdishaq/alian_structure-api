@@ -11,3 +11,6 @@ export class LinkEmailDto {
   @IsNotEmpty()
   email: string;
 }
+
+
+

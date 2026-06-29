@@ -112,3 +112,6 @@ export class RiskManagementController {
     return { triggered, asset, userId };
   }
 }
+
+
+

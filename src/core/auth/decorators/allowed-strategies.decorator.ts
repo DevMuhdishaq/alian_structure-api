@@ -15,3 +15,6 @@ export const ALLOWED_STRATEGIES_KEY = "allowedStrategies";
  */
 export const AllowedStrategies = (...strategies: AuthType[]) =>
   SetMetadata(ALLOWED_STRATEGIES_KEY, strategies);
+
+
+

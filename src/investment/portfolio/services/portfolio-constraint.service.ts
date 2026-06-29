@@ -281,3 +281,6 @@ export class PortfolioConstraintService {
     return maxCategoryWeight > 0.5 ? (maxCategoryWeight - 0.5) * 30 : 0;
   }
 }
+
+
+
