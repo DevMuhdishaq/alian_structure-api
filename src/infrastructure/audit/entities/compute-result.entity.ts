@@ -130,3 +130,6 @@ export class ComputeResult {
   @UpdateDateColumn()
   updatedAt: Date;
 }
+
+
+

@@ -134,3 +134,6 @@ export class RiskProfileResponseDto {
   createdAt: Date;
   updatedAt: Date;
 }
+
+
+

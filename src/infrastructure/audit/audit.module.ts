@@ -22,3 +22,6 @@ import { AuditLogService } from "./audit-log.service";
   exports: [TypeOrmModule, ProvenanceService, AuditLogService],
 })
 export class AuditModule {}
+
+
+

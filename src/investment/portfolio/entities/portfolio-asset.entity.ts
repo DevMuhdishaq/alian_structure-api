@@ -133,3 +133,6 @@ export class PortfolioAsset {
   @Column("uuid")
   portfolioId: string;
 }
+
+
+

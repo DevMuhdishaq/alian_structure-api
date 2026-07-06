@@ -24,3 +24,6 @@ export class KycGuard implements CanActivate {
     return user?.kycVerified === true;
   }
 }
+
+
+

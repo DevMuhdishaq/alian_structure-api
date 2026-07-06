@@ -296,3 +296,6 @@ export class RiskManagementService {
     return alerts;
   }
 }
+
+
+

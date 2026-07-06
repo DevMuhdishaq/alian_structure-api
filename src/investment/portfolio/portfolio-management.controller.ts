@@ -157,3 +157,6 @@ export class PortfolioManagementController {
     return this.portfolioService.archivePortfolio(id, PortfolioStatus.ARCHIVED);
   }
 }
+
+
+

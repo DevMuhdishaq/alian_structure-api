@@ -287,3 +287,6 @@ export class AlertsService {
     await this.preferenceRepo.remove(pref);
   }
 }
+
+
+

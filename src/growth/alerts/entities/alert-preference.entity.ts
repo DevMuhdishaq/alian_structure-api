@@ -47,3 +47,6 @@ export class AlertPreference {
   @UpdateDateColumn()
   updatedAt: Date;
 }
+
+
+

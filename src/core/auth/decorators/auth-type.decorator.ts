@@ -16,3 +16,6 @@ export const AuthType = createParamDecorator(
     return request.authType as AuthTypeEnum;
   },
 );
+
+
+

@@ -165,3 +165,6 @@ export class Wallet {
   @UpdateDateColumn()
   updatedAt: Date;
 }
+
+
+

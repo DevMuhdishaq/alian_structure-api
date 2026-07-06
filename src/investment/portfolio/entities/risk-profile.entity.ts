@@ -138,3 +138,6 @@ export class RiskProfile {
   @Column("uuid")
   userId: string;
 }
+
+
+

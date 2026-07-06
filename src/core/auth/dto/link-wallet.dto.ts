@@ -44,3 +44,6 @@ export class LinkWalletDto {
   @IsOptional()
   permissions?: string[];
 }
+
+
+

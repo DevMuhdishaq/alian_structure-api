@@ -40,3 +40,6 @@ export class HealthResponseDto {
   })
   components: Record<string, ComponentStatusDto>;
 }
+
+
+
