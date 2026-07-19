@@ -1,4 +1,5 @@
-import { IsString, IsNotEmpty, IsOptional } from "class-validator";
+import { IsString, IsNotEmpty } from "class-validator";
+import { RefreshTokenDto, TwoFactorVerifyDto } from "./auth.dto";
 
 export class TwoFactorSetupDto {
   @IsString()
@@ -6,21 +7,4 @@ export class TwoFactorSetupDto {
   type: "totp" | "sms" | "email";
 }
 
-export class TwoFactorVerifyDto {
-  @IsString()
-  @IsNotEmpty()
-  code: string;
-
-  @IsOptional()
-  @IsString()
-  backupCode?: string;
-}
-
-export class RefreshTokenDto {
-  @IsString()
-  @IsNotEmpty()
-  refreshToken: string;
-}
-
-
-
+export { TwoFactorVerifyDto, RefreshTokenDto };
