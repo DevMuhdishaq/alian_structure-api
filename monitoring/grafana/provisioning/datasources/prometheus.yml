@@ -1,0 +1,17 @@
+# Grafana datasource provisioning.
+#
+# Auto-registers the Prometheus instance defined in docker-compose.yml so the
+# application-overview dashboard has a data source the moment Grafana starts.
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    uid: prometheus
+    access: proxy
+    # Service name from docker-compose.yml (containers share a network).
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      timeInterval: 15s

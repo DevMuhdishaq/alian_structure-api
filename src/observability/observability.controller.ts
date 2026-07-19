@@ -1,6 +1,14 @@
-import { Controller, Get, Post, Res } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { Response } from "express";
+import { Request, Response } from "express";
+import { timingSafeEqual } from "crypto";
 import { Public } from "../common/decorators/public.decorator";
 import { SkipKyc } from "../common/decorators/skip-kyc.decorator";
 import {
@@ -110,7 +118,9 @@ export class ObservabilityController {
    * Exposes every metric registered in `src/config/metrics.ts` in Prometheus
    * text-exposition format so that a Prometheus server can scrape it.
    * Marked `@Public()` / `@SkipKyc()` because the scraper does not have a JWT
-   * and KYC is unrelated to operational metrics.
+   * and KYC is unrelated to operational metrics. In production, set
+   * `METRICS_AUTH_TOKEN` so only an authorised scraper can read it (see
+   * `assertMetricsAuthorized`).
    */
   @Get("metrics")
   @ApiOperation({
@@ -123,12 +133,57 @@ export class ObservabilityController {
     status: 200,
     description: "Prometheus metrics in text exposition format",
   })
-  async getMetrics(@Res({ passthrough: true }) res: Response): Promise<string> {
+  async getMetrics(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<string> {
+    this.assertMetricsAuthorized(req);
+
     // Make sure the response carries the Prometheus text-exposition content
     // type. Without this, NestJS's default handler would JSON-encode the
     // response body and scrapers would reject the payload as invalid.
     res.setHeader("Content-Type", register.contentType);
     return register.metrics();
+  }
+
+  /**
+   * Optionally protect the metrics endpoint with a shared token.
+   *
+   * When `METRICS_AUTH_TOKEN` is unset the endpoint stays open — fine for a
+   * private network or local dev. When it is set, the scraper must present
+   * the token via `Authorization: Bearer <token>` or a `?token=` query
+   * param. The comparison is constant-time to avoid leaking the token
+   * through timing side-channels.
+   */
+  private assertMetricsAuthorized(req: Request): void {
+    const expected = process.env.METRICS_AUTH_TOKEN;
+    if (!expected) return;
+
+    const header = req.headers["authorization"];
+    const headerToken =
+      typeof header === "string" && header.startsWith("Bearer ")
+        ? header.slice("Bearer ".length)
+        : undefined;
+    const queryToken =
+      typeof req.query?.token === "string" ? req.query.token : undefined;
+    const provided = headerToken ?? queryToken;
+
+    if (!provided || !this.constantTimeEquals(provided, expected)) {
+      throw new UnauthorizedException("Invalid or missing metrics token");
+    }
+  }
+
+  private constantTimeEquals(a: string, b: string): boolean {
+    const bufA = Buffer.from(a);
+    const bufB = Buffer.from(b);
+    // timingSafeEqual throws on length mismatch; compare a self-equal buffer
+    // of matching length first so the early return itself stays constant-time
+    // for equal-length inputs.
+    if (bufA.length !== bufB.length) {
+      timingSafeEqual(bufA, bufA);
+      return false;
+    }
+    return timingSafeEqual(bufA, bufB);
   }
 }
 

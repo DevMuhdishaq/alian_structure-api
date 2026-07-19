@@ -7,6 +7,9 @@ import {
   BatchSpanProcessor,
   SimpleSpanProcessor,
   SpanExporter,
+  ParentBasedSampler,
+  TraceIdRatioBasedSampler,
+  Sampler,
 } from "@opentelemetry/sdk-trace-base";
 import {
   trace,
@@ -54,12 +57,32 @@ const resource = resourceFromAttributes({
 
 let sdk: NodeSDK;
 
+/**
+ * Build a head-based sampler from `OTEL_TRACES_SAMPLER_RATIO` (0..1).
+ *
+ * Wrapping the ratio sampler in a `ParentBasedSampler` means a sampling
+ * decision made upstream is always respected, so distributed traces are not
+ * broken part-way through. A ratio of 1 keeps the previous always-on
+ * behaviour; a lower value bounds tracing overhead in production.
+ */
+export function buildSampler(): Sampler {
+  const raw = process.env.OTEL_TRACES_SAMPLER_RATIO;
+  let ratio = raw === undefined ? 1 : parseFloat(raw);
+  if (!Number.isFinite(ratio)) ratio = 1;
+  ratio = Math.min(1, Math.max(0, ratio));
+
+  return new ParentBasedSampler({
+    root: new TraceIdRatioBasedSampler(ratio),
+  });
+}
+
 function buildSdk(): NodeSDK {
   const exporters = buildExporters();
   const processors = exporters.map((exp) => new BatchSpanProcessor(exp));
 
   return new NodeSDK({
     resource,
+    sampler: buildSampler(),
     spanProcessors: processors,
     textMapPropagator: new W3CTraceContextPropagator(),
     instrumentations: [
@@ -78,11 +101,26 @@ function buildSdk(): NodeSDK {
   });
 }
 
+/**
+ * Whether tracing is enabled. Disabled only when `TRACING_ENABLED` is the
+ * literal string "false" so the default (unset) stays on.
+ */
+export const isTracingEnabled = (): boolean =>
+  process.env.TRACING_ENABLED !== "false";
+
 export const startTracing = async (): Promise<void> => {
+  if (!isTracingEnabled()) {
+    console.log("OpenTelemetry tracing disabled (TRACING_ENABLED=false)");
+    return;
+  }
   try {
     sdk = buildSdk();
     sdk.start();
-    console.log("OpenTelemetry tracing initialized");
+    console.log(
+      `OpenTelemetry tracing initialized (sampler ratio=${
+        process.env.OTEL_TRACES_SAMPLER_RATIO ?? "1"
+      })`,
+    );
   } catch (err) {
     console.error("Failed to start OpenTelemetry SDK:", err);
   }

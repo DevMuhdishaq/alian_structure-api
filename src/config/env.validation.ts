@@ -85,6 +85,30 @@ export class EnvironmentVariables {
   @IsUrl()
   OTEL_EXPORTER_OTLP_ENDPOINT?: string;
 
+  // Observability toggles
+  // Master switch for OpenTelemetry tracing. When false the SDK is never
+  // started, so there is zero tracing overhead.
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => value !== "false")
+  TRACING_ENABLED?: boolean = true;
+
+  // Head-based trace sampling ratio in the range [0, 1]. 1 = sample every
+  // trace, 0 = sample none. Keeps tracing overhead bounded in production.
+  @IsOptional()
+  @IsNumber()
+  @Transform(({ value }) => (value === undefined ? 1 : parseFloat(value)))
+  @Min(0)
+  @Max(1)
+  OTEL_TRACES_SAMPLER_RATIO?: number = 1;
+
+  // Optional bearer/query token that protects the Prometheus /metrics
+  // endpoint. When unset the endpoint is open (fine for private networks
+  // and local dev); set it in production so only the scraper can read it.
+  @IsOptional()
+  @IsString()
+  METRICS_AUTH_TOKEN?: string;
+
   // Blockchain configuration
   @IsNumber()
   @Transform(({ value }) => parseInt(value, 10) || 1)

@@ -19,6 +19,17 @@ function makeRes(): { setHeader: jest.Mock; headers: Record<string, string> } {
   } as any;
 }
 
+/**
+ * Minimal Express-request stub carrying the auth header / query token the
+ * metrics endpoint inspects when `METRICS_AUTH_TOKEN` is set.
+ */
+function makeReq(opts: { authorization?: string; token?: string } = {}): any {
+  return {
+    headers: opts.authorization ? { authorization: opts.authorization } : {},
+    query: opts.token ? { token: opts.token } : {},
+  };
+}
+
 describe("ObservabilityController - Prometheus /metrics endpoint (issue #25)", () => {
   let controller: ObservabilityController;
 
@@ -56,7 +67,7 @@ describe("ObservabilityController - Prometheus /metrics endpoint (issue #25)", (
     httpRequestTotal.reset();
     const res = makeRes();
 
-    const body = await controller.getMetrics(res as any);
+    const body = await controller.getMetrics(makeReq(), res as any);
 
     expect(typeof body).toBe("string");
     expect(body.length).toBeGreaterThan(0);
@@ -76,7 +87,7 @@ describe("ObservabilityController - Prometheus /metrics endpoint (issue #25)", (
     });
     const res = makeRes();
 
-    const body = await controller.getMetrics(res as any);
+    const body = await controller.getMetrics(makeReq(), res as any);
 
     expect(body).toContain(
       "# TYPE alian_structure_http_requests_total counter",
@@ -84,6 +95,59 @@ describe("ObservabilityController - Prometheus /metrics endpoint (issue #25)", (
     expect(body).toMatch(
       /alian_structure_http_requests_total\{[^}]*method="GET"[^}]*\}/,
     );
+  });
+
+  describe("token protection via METRICS_AUTH_TOKEN", () => {
+    const ORIGINAL = process.env.METRICS_AUTH_TOKEN;
+
+    afterEach(() => {
+      if (ORIGINAL === undefined) {
+        delete process.env.METRICS_AUTH_TOKEN;
+      } else {
+        process.env.METRICS_AUTH_TOKEN = ORIGINAL;
+      }
+    });
+
+    it("stays open when no token is configured", async () => {
+      delete process.env.METRICS_AUTH_TOKEN;
+      const body = await controller.getMetrics(makeReq(), makeRes() as any);
+      expect(typeof body).toBe("string");
+    });
+
+    it("rejects requests with no token when one is configured", async () => {
+      process.env.METRICS_AUTH_TOKEN = "s3cret";
+      await expect(
+        controller.getMetrics(makeReq(), makeRes() as any),
+      ).rejects.toThrow(/token/i);
+    });
+
+    it("rejects requests bearing the wrong token", async () => {
+      process.env.METRICS_AUTH_TOKEN = "s3cret";
+      await expect(
+        controller.getMetrics(
+          makeReq({ authorization: "Bearer nope" }),
+          makeRes() as any,
+        ),
+      ).rejects.toThrow(/token/i);
+    });
+
+    it("accepts the correct token via Authorization header", async () => {
+      process.env.METRICS_AUTH_TOKEN = "s3cret";
+      const body = await controller.getMetrics(
+        makeReq({ authorization: "Bearer s3cret" }),
+        makeRes() as any,
+      );
+      expect(typeof body).toBe("string");
+    });
+
+    it("accepts the correct token via query param", async () => {
+      process.env.METRICS_AUTH_TOKEN = "s3cret";
+      const body = await controller.getMetrics(
+        makeReq({ token: "s3cret" }),
+        makeRes() as any,
+      );
+      expect(typeof body).toBe("string");
+    });
   });
 });
 
