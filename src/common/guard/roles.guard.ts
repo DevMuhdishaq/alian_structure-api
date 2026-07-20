@@ -8,14 +8,14 @@ import {
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { ROLES_KEY } from "./roles.decorator";
-import { Role, hasRole } from "./roles.enum";
+import { Role, hasRole, normalizeRole } from "./roles.enum";
 
 type AuthenticatedRequest = {
   user?: {
     id?: string;
     address?: string;
-    role?: Role;
-    roles?: Role[];
+    role?: string;
+    roles?: string[];
   };
 };
 
@@ -50,8 +50,11 @@ export class RolesGuard implements CanActivate {
       throw new UnauthorizedException("No authenticated user found on request");
     }
 
-    // Normalise: support both `role` (single) and `roles` (array) shapes
-    const userRoles: Role[] = user.roles ?? (user.role ? [user.role] : []);
+    // Normalise: support both `role` (single) and `roles` (array) shapes, and
+    // coerce legacy lowercase claims (e.g. "admin") minted before RBAC
+    // canonicalisation into the canonical UPPERCASE Role.
+    const rawRoles: string[] = user.roles ?? (user.role ? [user.role] : []);
+    const userRoles: Role[] = rawRoles.map((r) => normalizeRole(r));
 
     if (userRoles.length === 0) {
       this.logger.warn(`User ${user.id ?? user.address} has no roles assigned`);

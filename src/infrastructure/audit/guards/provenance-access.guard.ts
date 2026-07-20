@@ -4,7 +4,7 @@ import {
   ExecutionContext,
   ForbiddenException,
 } from "@nestjs/common";
-import { UserRole } from "src/core/user/entities/user.entity";
+import { Role, normalizeRole } from "src/common/guard/roles.enum";
 
 /**
  * Guard that ensures users can only access their own provenance records.
@@ -21,8 +21,9 @@ export class ProvenanceAccessGuard implements CanActivate {
       throw new ForbiddenException("No authenticated user found");
     }
 
-    // Admins can access all provenance records
-    if (user.role === UserRole.ADMIN) {
+    // Admins can access all provenance records. Coerce legacy lowercase
+    // claims to the canonical Role before comparing.
+    if (normalizeRole(user.role) === Role.ADMIN) {
       return true;
     }
 
