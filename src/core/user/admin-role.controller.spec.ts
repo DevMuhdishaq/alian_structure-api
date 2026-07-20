@@ -4,6 +4,9 @@ import { AdminRoleController } from "./admin-role.controller";
 import { UserService } from "./user.service";
 import { User } from "./entities/user.entity";
 import { Role } from "src/common/guard/roles.enum";
+import { RolesGuard } from "src/common/guard/roles.guard";
+import { JwtAuthGuard } from "src/core/auth/guards/jwt-auth.guard";
+import { AdminTwoFactorGuard } from "src/core/auth/guards/admin-two-factor.guard";
 
 describe("AdminRoleController", () => {
   let controller: AdminRoleController;
@@ -21,7 +24,17 @@ describe("AdminRoleController", () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AdminRoleController],
       providers: [{ provide: UserService, useValue: userService }],
-    }).compile();
+    })
+      // These are unit tests for the controller's logic; the guard behaviour
+      // is covered by their own specs, so override them with pass-throughs
+      // to avoid resolving their (auth-module) dependencies here.
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(AdminTwoFactorGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<AdminRoleController>(AdminRoleController);
   });
