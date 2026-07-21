@@ -1,9 +1,20 @@
 import { INestApplication } from "@nestjs/common";
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { DocumentBuilder, SwaggerModule, OpenAPIObject } from "@nestjs/swagger";
 import { ConfigService } from "@nestjs/config";
 
-export function setupSwagger(app: INestApplication): void {
+export function setupSwagger(app: INestApplication): OpenAPIObject | null {
   const configService = app.get(ConfigService);
+  const nodeEnv = configService.get<string>("NODE_ENV", "development");
+
+  // Swagger is opt-in in production — set SWAGGER_ENABLED=true to expose it.
+  const swaggerEnabled =
+    nodeEnv !== "production" ||
+    configService.get<string>("SWAGGER_ENABLED") === "true";
+
+  if (!swaggerEnabled) {
+    return null;
+  }
+
   const port = Number(process.env.PORT || configService.get("PORT", 3001));
 
   const config = new DocumentBuilder()
@@ -76,6 +87,8 @@ export function setupSwagger(app: INestApplication): void {
       tryItOutEnabled: true,
     },
   });
+
+  return document;
 }
 
 
