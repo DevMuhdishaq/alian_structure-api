@@ -199,7 +199,6 @@ describe("EnhancedAuthService — 2FA", () => {
       // token should be marked 2FA-verified
       expect(jwtService.sign).toHaveBeenCalledWith(
         expect.objectContaining({ twoFactorVerified: true }),
-        expect.anything(),
       );
       expect(twoFactorRecord!.failedAttempts).toBe(0);
     });
