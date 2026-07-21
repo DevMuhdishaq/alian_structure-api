@@ -151,3 +151,13 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Generated OpenAPI artifacts — produced by `npm run openapi:export`
+docs/openapi.json
+
+# Generated TypeScript client — produced by `npm run openapi:client`
+client/
+
+# OpenAPI Generator CLI cache
+.openapi-generator/
+openapitools.json
