@@ -1,3 +1,16 @@
+// Errors
+export { ErrorCode } from "./errors/error-codes";
+export {
+  AppException,
+  NotFoundException,
+  UnauthorizedException,
+  ForbiddenException,
+  BadRequestException,
+  ConflictException,
+  RateLimitException,
+} from "./errors/app.exception";
+export type { ErrorResponse } from "./errors/app.exception";
+
 // Guards
 export { RolesGuard } from "./guard/roles.guard";
 export { KycGuard } from "./guard/kyc.guard";
