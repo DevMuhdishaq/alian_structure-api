@@ -48,5 +48,3 @@ export function SensitiveRateLimit(tier: SensitiveTier = "default") {
 export function RateLimit(options: RateLimitOptions) {
   return applyDecorators(SetMetadata(RATE_LIMIT_KEY, options));
 }
-
-

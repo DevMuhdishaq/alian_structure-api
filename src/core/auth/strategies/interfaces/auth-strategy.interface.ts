@@ -164,5 +164,3 @@ export interface ApiKeyCredentials {
   /** API secret */
   apiSecret: string;
 }
-
-

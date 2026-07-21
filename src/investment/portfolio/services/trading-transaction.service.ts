@@ -18,6 +18,3 @@ export class TradingTransactionService {
     return Promise.resolve();
   }
 }
-
-
-

@@ -259,6 +259,3 @@ export class ConnectionManagerService {
     }
   }
 }
-
-
-

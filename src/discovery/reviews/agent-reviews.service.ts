@@ -64,9 +64,7 @@ export class AgentReviewsService {
       where: { agentId: dto.agentId, userId },
     });
     if (existing) {
-      throw new ConflictException(
-        "You have already reviewed this agent",
-      );
+      throw new ConflictException("You have already reviewed this agent");
     }
 
     const spamScore = computeSpamScore(dto.reviewText ?? "");
@@ -100,7 +98,13 @@ export class AgentReviewsService {
       select: ["rating"],
     });
 
-    const distribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    const distribution: Record<number, number> = {
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 0,
+    };
     let sum = 0;
     for (const r of reviews) {
       distribution[r.rating] = (distribution[r.rating] ?? 0) + 1;

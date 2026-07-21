@@ -14,6 +14,3 @@ export class RiskAlertListener {
     });
   }
 }
-
-
-

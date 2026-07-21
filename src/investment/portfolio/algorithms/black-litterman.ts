@@ -153,6 +153,3 @@ export class BlackLittermanModel {
     return matrix.map((row) => row.map((val) => (1 / val) * 0.1));
   }
 }
-
-
-

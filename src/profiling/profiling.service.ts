@@ -346,6 +346,3 @@ export class ProfilingService {
     return false;
   }
 }
-
-
-

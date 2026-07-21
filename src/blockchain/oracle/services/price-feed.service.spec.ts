@@ -123,10 +123,16 @@ describe("PriceFeedService", () => {
       mockRepo.create.mockReturnValue(fakeRecord);
       mockRepo.save.mockResolvedValue(fakeRecord);
 
-      const result = await service.getCurrentPrice("ETH", SupportedChain.ETHEREUM);
+      const result = await service.getCurrentPrice(
+        "ETH",
+        SupportedChain.ETHEREUM,
+      );
 
       expect(mockRepo.create).toHaveBeenCalledWith(
-        expect.objectContaining({ asset: "ETH", chain: SupportedChain.ETHEREUM }),
+        expect.objectContaining({
+          asset: "ETH",
+          chain: SupportedChain.ETHEREUM,
+        }),
       );
       expect(mockRepo.save).toHaveBeenCalledWith(fakeRecord);
       expect(result.asset).toBe("ETH");
@@ -158,7 +164,10 @@ describe("PriceFeedService", () => {
 
       expect(mockEmitter.emit).toHaveBeenCalledWith(
         "price.deviation",
-        expect.objectContaining({ asset: "ETH", chain: SupportedChain.ETHEREUM }),
+        expect.objectContaining({
+          asset: "ETH",
+          chain: SupportedChain.ETHEREUM,
+        }),
       );
     });
 

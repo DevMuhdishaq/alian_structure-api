@@ -3,10 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { AuditLog } from "./entities/audit-log.entity";
-import {
-  QueryAuditLogDto,
-  ExportAuditLogDto,
-} from "./dto/query-audit-log.dto";
+import { QueryAuditLogDto, ExportAuditLogDto } from "./dto/query-audit-log.dto";
 import { AuditLogListResponseDto } from "./dto/audit-log-response.dto";
 import { ExportSigningService } from "./algorithms/export-signing.service";
 
@@ -35,7 +32,7 @@ export class AuditLogService {
     return this.logs.slice(-limit);
   }
 
-    constructor(
+  constructor(
     @InjectRepository(AuditLog)
     private readonly repo: Repository<AuditLog>,
     private readonly signingService: ExportSigningService,
@@ -153,7 +150,9 @@ export class AuditLogService {
   // Cold-storage transfer is delegated to an external sink (S3/Glacier);
   // this only flips the archivedAt marker once the transfer succeeds.
   @Cron(CronExpression.EVERY_DAY_AT_2AM)
-  async archiveOldLogs(coldStorageWriter?: (logs: AuditLog[]) => Promise<void>) {
+  async archiveOldLogs(
+    coldStorageWriter?: (logs: AuditLog[]) => Promise<void>,
+  ) {
     const cutoff = new Date();
     cutoff.setFullYear(cutoff.getFullYear() - ARCHIVE_AFTER_YEARS);
 
@@ -189,6 +188,3 @@ export class AuditLogService {
       .execute();
   }
 }
-
-
-

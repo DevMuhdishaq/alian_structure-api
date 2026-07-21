@@ -651,4 +651,3 @@ export class EnhancedAuthService {
     return this.userRepository.findOne({ where: { id: userId } });
   }
 }
-

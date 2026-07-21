@@ -55,6 +55,3 @@ export class PortfolioAlertListener {
     });
   }
 }
-
-
-

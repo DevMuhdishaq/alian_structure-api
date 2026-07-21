@@ -22,6 +22,3 @@ export class VerifySignatureDto {
   })
   expectedSigner: string;
 }
-
-
-

@@ -7,7 +7,10 @@ export class OAuthCallbackDto {
   @IsNotEmpty()
   code: string;
 
-  @ApiProperty({ description: "State parameter for CSRF protection", required: false })
+  @ApiProperty({
+    description: "State parameter for CSRF protection",
+    required: false,
+  })
   @IsString()
   @IsOptional()
   state?: string;

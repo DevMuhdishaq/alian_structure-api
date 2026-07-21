@@ -6,6 +6,7 @@ import { ConfigService } from "@nestjs/config";
 import { logger } from "./config/logger";
 import { GlobalExceptionFilter } from "./common/filters/global-exception.filter";
 import { SanitizePipe } from "./common/pipes/sanitize.pipe";
+import { createGlobalValidationPipe } from "./common/pipes/validation.pipe";
 import { createCorsConfig } from "./config/cors.config";
 import { createHelmetConfig } from "./config/helmet.config";
 import { setupSwagger } from "./config/swagger.config";
@@ -72,13 +73,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     // Sanitize first to strip XSS payloads before validation
     new SanitizePipe(),
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-      disableErrorMessages: configService.get("NODE_ENV") === "production",
-      forbidUnknownValues: true,
-    }),
+    createGlobalValidationPipe(),
   );
 
   // CORS configuration with stricter settings
@@ -166,6 +161,3 @@ process.on("unhandledRejection", (reason: any) => {
   logger.error({ error, stack: error.stack }, "Unhandled Rejection");
   process.exit(1);
 });
-
-
-

@@ -74,6 +74,3 @@ describe("AdminTwoFactorGuard", () => {
     expect(isTwoFactorEnabled).toHaveBeenCalledWith("admin-2");
   });
 });
-
-
-

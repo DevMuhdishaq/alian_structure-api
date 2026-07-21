@@ -15,7 +15,10 @@ import {
   OAuthCredentials,
 } from "../interfaces/auth-strategy.interface";
 import { User } from "src/core/user/entities/user.entity";
-import { SocialAccount, SocialProvider } from "../../entities/social-account.entity";
+import {
+  SocialAccount,
+  SocialProvider,
+} from "../../entities/social-account.entity";
 import { AuditLogService } from "src/infrastructure/audit/audit-log.service";
 
 interface OAuthProviderConfig {
@@ -56,7 +59,9 @@ export class OAuthStrategy implements AuthStrategy {
     if (this.configService.get<string>("OAUTH_GOOGLE_CLIENT_ID")) {
       this.providers.set("google", {
         clientId: this.configService.get<string>("OAUTH_GOOGLE_CLIENT_ID")!,
-        clientSecret: this.configService.get<string>("OAUTH_GOOGLE_CLIENT_SECRET")!,
+        clientSecret: this.configService.get<string>(
+          "OAUTH_GOOGLE_CLIENT_SECRET",
+        )!,
         authorizationUrl: "https://accounts.google.com/o/oauth2/v2/auth",
         tokenUrl: "https://oauth2.googleapis.com/token",
         userInfoUrl: "https://www.googleapis.com/oauth2/v2/userinfo",
@@ -67,7 +72,9 @@ export class OAuthStrategy implements AuthStrategy {
     if (this.configService.get<string>("OAUTH_GITHUB_CLIENT_ID")) {
       this.providers.set("github", {
         clientId: this.configService.get<string>("OAUTH_GITHUB_CLIENT_ID")!,
-        clientSecret: this.configService.get<string>("OAUTH_GITHUB_CLIENT_SECRET")!,
+        clientSecret: this.configService.get<string>(
+          "OAUTH_GITHUB_CLIENT_SECRET",
+        )!,
         authorizationUrl: "https://github.com/login/oauth/authorize",
         tokenUrl: "https://github.com/login/oauth/access_token",
         userInfoUrl: "https://api.github.com/user",
@@ -78,10 +85,13 @@ export class OAuthStrategy implements AuthStrategy {
     if (this.configService.get<string>("OAUTH_TWITTER_CLIENT_ID")) {
       this.providers.set("twitter", {
         clientId: this.configService.get<string>("OAUTH_TWITTER_CLIENT_ID")!,
-        clientSecret: this.configService.get<string>("OAUTH_TWITTER_CLIENT_SECRET")!,
+        clientSecret: this.configService.get<string>(
+          "OAUTH_TWITTER_CLIENT_SECRET",
+        )!,
         authorizationUrl: "https://twitter.com/i/oauth2/authorize",
         tokenUrl: "https://api.twitter.com/2/oauth2/token",
-        userInfoUrl: "https://api.twitter.com/2/users/me?user.fields=profile_image_url",
+        userInfoUrl:
+          "https://api.twitter.com/2/users/me?user.fields=profile_image_url",
         scopes: ["tweet.read", "users.read"],
       });
     }
@@ -126,7 +136,9 @@ export class OAuthStrategy implements AuthStrategy {
     const { provider, code } = credentials as OAuthCredentials;
 
     if (!provider || !code) {
-      throw new BadRequestException("Provider and authorization code are required");
+      throw new BadRequestException(
+        "Provider and authorization code are required",
+      );
     }
 
     const providerConfig = this.providers.get(provider);
@@ -135,8 +147,16 @@ export class OAuthStrategy implements AuthStrategy {
     }
 
     try {
-      const accessToken = await this.exchangeCodeForToken(providerConfig, provider, code);
-      const userInfo = await this.getUserInfo(providerConfig, provider, accessToken);
+      const accessToken = await this.exchangeCodeForToken(
+        providerConfig,
+        provider,
+        code,
+      );
+      const userInfo = await this.getUserInfo(
+        providerConfig,
+        provider,
+        accessToken,
+      );
       const user = await this.findOrCreateUser(userInfo, provider);
 
       await this.auditLogService.recordVerification({
@@ -159,17 +179,32 @@ export class OAuthStrategy implements AuthStrategy {
     }
   }
 
-  async linkProvider(userId: string, provider: string, code: string): Promise<{ message: string }> {
+  async linkProvider(
+    userId: string,
+    provider: string,
+    code: string,
+  ): Promise<{ message: string }> {
     const providerConfig = this.providers.get(provider);
     if (!providerConfig) {
       throw new BadRequestException(`Unsupported OAuth provider: ${provider}`);
     }
 
-    const accessToken = await this.exchangeCodeForToken(providerConfig, provider, code);
-    const userInfo = await this.getUserInfo(providerConfig, provider, accessToken);
+    const accessToken = await this.exchangeCodeForToken(
+      providerConfig,
+      provider,
+      code,
+    );
+    const userInfo = await this.getUserInfo(
+      providerConfig,
+      provider,
+      accessToken,
+    );
 
     const existingSocial = await this.socialAccountRepository.findOne({
-      where: { provider: provider as SocialProvider, providerUserId: userInfo.id },
+      where: {
+        provider: provider as SocialProvider,
+        providerUserId: userInfo.id,
+      },
     });
 
     if (existingSocial && existingSocial.userId !== userId) {
@@ -201,13 +236,18 @@ export class OAuthStrategy implements AuthStrategy {
     return { message: `${provider} account linked successfully` };
   }
 
-  async unlinkProvider(userId: string, provider: string): Promise<{ message: string }> {
+  async unlinkProvider(
+    userId: string,
+    provider: string,
+  ): Promise<{ message: string }> {
     const social = await this.socialAccountRepository.findOne({
       where: { userId, provider: provider as SocialProvider },
     });
 
     if (!social) {
-      throw new BadRequestException(`No ${provider} account linked to this user`);
+      throw new BadRequestException(
+        `No ${provider} account linked to this user`,
+      );
     }
 
     await this.socialAccountRepository.remove(social);
@@ -222,8 +262,12 @@ export class OAuthStrategy implements AuthStrategy {
     return { message: `${provider} account unlinked successfully` };
   }
 
-  async getLinkedProviders(userId: string): Promise<{ provider: string; email: string | null; linkedAt: Date }[]> {
-    const accounts = await this.socialAccountRepository.find({ where: { userId } });
+  async getLinkedProviders(
+    userId: string,
+  ): Promise<{ provider: string; email: string | null; linkedAt: Date }[]> {
+    const accounts = await this.socialAccountRepository.find({
+      where: { userId },
+    });
     return accounts.map((a) => ({
       provider: a.provider,
       email: a.email,
@@ -266,8 +310,12 @@ export class OAuthStrategy implements AuthStrategy {
     });
 
     if (!response.ok) {
-      this.logger.error(`Token exchange failed for ${provider}: ${response.status}`);
-      throw new UnauthorizedException("Failed to exchange OAuth code for token");
+      this.logger.error(
+        `Token exchange failed for ${provider}: ${response.status}`,
+      );
+      throw new UnauthorizedException(
+        "Failed to exchange OAuth code for token",
+      );
     }
 
     const data = await response.json();
@@ -284,7 +332,9 @@ export class OAuthStrategy implements AuthStrategy {
     });
 
     if (!response.ok) {
-      throw new UnauthorizedException("Failed to fetch user info from OAuth provider");
+      throw new UnauthorizedException(
+        "Failed to fetch user info from OAuth provider",
+      );
     }
 
     const data = await response.json();
@@ -307,9 +357,15 @@ export class OAuthStrategy implements AuthStrategy {
     };
   }
 
-  private async findOrCreateUser(userInfo: OAuthUserInfo, provider: string): Promise<User> {
+  private async findOrCreateUser(
+    userInfo: OAuthUserInfo,
+    provider: string,
+  ): Promise<User> {
     const existingSocial = await this.socialAccountRepository.findOne({
-      where: { provider: provider as SocialProvider, providerUserId: userInfo.id },
+      where: {
+        provider: provider as SocialProvider,
+        providerUserId: userInfo.id,
+      },
       relations: ["user"],
     });
 
@@ -319,7 +375,9 @@ export class OAuthStrategy implements AuthStrategy {
 
     let user: User | null = null;
     if (userInfo.email) {
-      user = await this.userRepository.findOne({ where: { email: userInfo.email } });
+      user = await this.userRepository.findOne({
+        where: { email: userInfo.email },
+      });
     }
 
     if (!user) {
@@ -332,7 +390,9 @@ export class OAuthStrategy implements AuthStrategy {
         emailVerified: !!userInfo.email,
       });
       await this.userRepository.save(user);
-      this.logger.log(`Created new user from OAuth (${provider}): ${userInfo.email}`);
+      this.logger.log(
+        `Created new user from OAuth (${provider}): ${userInfo.email}`,
+      );
     }
 
     const social = this.socialAccountRepository.create({

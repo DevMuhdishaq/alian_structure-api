@@ -21,7 +21,12 @@ export class GetHistoricalPricesDto {
   @IsEnum(SupportedChain)
   chain: SupportedChain;
 
-  @ApiPropertyOptional({ example: 100, default: 100, minimum: 1, maximum: 1000 })
+  @ApiPropertyOptional({
+    example: 100,
+    default: 100,
+    minimum: 1,
+    maximum: 1000,
+  })
   @IsOptional()
   @IsInt()
   @Min(1)

@@ -24,6 +24,3 @@ export class ProfileService {
     return `This action removes a #${id} profile`;
   }
 }
-
-
-

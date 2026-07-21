@@ -476,6 +476,3 @@ export function createDashboardClient(
 ): DashboardClientService {
   return new DashboardClientService(config);
 }
-
-
-

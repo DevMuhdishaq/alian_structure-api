@@ -17,9 +17,7 @@ import {
   TraditionalCredentials,
 } from "../interfaces/auth-strategy.interface";
 import { User } from "src/core/user/entities/user.entity";
-import {
-  resolveRateLimitTierFromRole,
-} from "src/config/quota.config";
+import { resolveRateLimitTierFromRole } from "src/config/quota.config";
 
 /**
  * Traditional email/password authentication strategy
@@ -185,5 +183,3 @@ export class TraditionalStrategy implements AuthStrategy {
     }
   }
 }
-
-

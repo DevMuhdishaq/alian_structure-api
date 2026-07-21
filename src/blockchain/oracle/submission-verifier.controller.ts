@@ -21,6 +21,3 @@ export class SubmissionVerifierController {
     return this.audit.getLogs();
   }
 }
-
-
-

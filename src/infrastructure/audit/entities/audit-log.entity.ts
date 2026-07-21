@@ -92,7 +92,11 @@ export class AuditLog {
   userAgent: string | null;
 
   // Encrypted at rest: may contain PII or sensitive request/response context.
-  @Column({ type: "text", nullable: true, transformer: new EncryptedTransformer() })
+  @Column({
+    type: "text",
+    nullable: true,
+    transformer: new EncryptedTransformer(),
+  })
   details: string | null;
 
   @Column({ type: "jsonb", nullable: true })

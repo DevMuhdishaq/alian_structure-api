@@ -57,14 +57,8 @@ export function getRateLimitPolicyFromEnv(
     enterprise: "RATE_LIMIT_ENTERPRISE_PER_MINUTE",
   };
 
-  const limit = readEnvNumber(
-    env[envKeyByTier[tier]],
-    defaults[tier],
-  );
-  const windowMs = readEnvNumber(
-    env.RATE_LIMIT_WINDOW_MS,
-    DEFAULT_WINDOW_MS,
-  );
+  const limit = readEnvNumber(env[envKeyByTier[tier]], defaults[tier]);
+  const windowMs = readEnvNumber(env.RATE_LIMIT_WINDOW_MS, DEFAULT_WINDOW_MS);
   const burstMultiplier = readEnvNumber(
     env.RATE_LIMIT_BURST_MULTIPLIER,
     DEFAULT_BURST_MULTIPLIER,
@@ -137,4 +131,3 @@ export const QUOTA_LEVELS: Record<string, QuotaConfig> = {
 };
 
 export const DEFAULT_QUOTA = QUOTA_LEVELS.free;
-

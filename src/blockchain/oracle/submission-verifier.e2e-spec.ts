@@ -19,6 +19,3 @@ describe("Submission Verifier", () => {
     expect(Array.isArray(res.body)).toBe(true);
   });
 });
-
-
-

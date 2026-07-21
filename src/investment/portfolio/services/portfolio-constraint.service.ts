@@ -231,7 +231,9 @@ export class PortfolioConstraintService {
 
     return Math.min(
       100,
-      Number((weightedRisk + concentrationPenalty + categoryPenalty).toFixed(2)),
+      Number(
+        (weightedRisk + concentrationPenalty + categoryPenalty).toFixed(2),
+      ),
     );
   }
 
@@ -281,6 +283,3 @@ export class PortfolioConstraintService {
     return maxCategoryWeight > 0.5 ? (maxCategoryWeight - 0.5) * 30 : 0;
   }
 }
-
-
-

@@ -26,6 +26,3 @@ export {
   SENSITIVE_BODY_FIELDS,
   REQUEST_ID_HEADER,
 } from "./middleware/logging.config";
-
-
-

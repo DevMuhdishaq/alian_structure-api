@@ -38,7 +38,9 @@ jest.mock("ethers", () => {
         ],
       }),
     ),
-    getTransactionReceipt: jest.fn().mockResolvedValue({ gasUsed: BigInt(21_000) }),
+    getTransactionReceipt: jest
+      .fn()
+      .mockResolvedValue({ gasUsed: BigInt(21_000) }),
     getTransaction: jest.fn().mockResolvedValue({
       hash: "0xreplay",
       from: "0xfrom",
@@ -81,7 +83,11 @@ describe("SimulatorService", () => {
         forkBlockNumber: 19_000_000,
         blocksToSimulate: 10,
       };
-      const expected = { id: "uuid-1", ...dto, status: SimulationStatus.PENDING };
+      const expected = {
+        id: "uuid-1",
+        ...dto,
+        status: SimulationStatus.PENDING,
+      };
       mockRepo.create.mockReturnValue(expected);
       mockRepo.save.mockResolvedValue(expected);
 
@@ -195,7 +201,10 @@ describe("SimulatorService", () => {
       } as Simulation;
       mockRepo.findOne.mockResolvedValue(sim);
       mockRepo.update.mockResolvedValue({});
-      mockRepo.findOneBy.mockResolvedValue({ ...sim, status: SimulationStatus.RUNNING });
+      mockRepo.findOneBy.mockResolvedValue({
+        ...sim,
+        status: SimulationStatus.RUNNING,
+      });
 
       await service.runSimulation("s1", "u1", { replayTxHashes: ["0xabc"] });
 
@@ -209,7 +218,9 @@ describe("SimulatorService", () => {
   describe("findOne", () => {
     it("throws NotFoundException when simulation not found", async () => {
       mockRepo.findOne.mockResolvedValue(null);
-      await expect(service.findOne("missing", "u1")).rejects.toThrow(NotFoundException);
+      await expect(service.findOne("missing", "u1")).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it("returns simulation when found", async () => {

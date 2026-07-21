@@ -1,6 +1,10 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { getRepositoryToken } from "@nestjs/typeorm";
-import { ConflictException, ForbiddenException, NotFoundException } from "@nestjs/common";
+import {
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+} from "@nestjs/common";
 import { AgentReviewsService } from "./agent-reviews.service";
 import { AgentReview, ReviewStatus } from "./entities/agent-review.entity";
 
@@ -31,21 +35,26 @@ describe("AgentReviewsService", () => {
     const dto = { agentId: "agent-1", rating: 4, reviewText: "Great agent!" };
 
     it("throws ForbiddenException if user has not used agent", async () => {
-      await expect(
-        service.createReview("user-1", dto, false),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.createReview("user-1", dto, false)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it("throws ConflictException if review already exists", async () => {
       repo.findOne.mockResolvedValue({ id: "existing" });
-      await expect(
-        service.createReview("user-1", dto, true),
-      ).rejects.toThrow(ConflictException);
+      await expect(service.createReview("user-1", dto, true)).rejects.toThrow(
+        ConflictException,
+      );
     });
 
     it("creates review with PENDING status for clean text", async () => {
       repo.findOne.mockResolvedValue(null);
-      const created = { ...dto, userId: "user-1", status: ReviewStatus.PENDING, spamScore: 0 };
+      const created = {
+        ...dto,
+        userId: "user-1",
+        status: ReviewStatus.PENDING,
+        spamScore: 0,
+      };
       repo.create.mockReturnValue(created);
       repo.save.mockResolvedValue(created);
 
@@ -56,7 +65,10 @@ describe("AgentReviewsService", () => {
 
     it("flags review with FLAGGED status for spammy text", async () => {
       repo.findOne.mockResolvedValue(null);
-      const spamDto = { ...dto, reviewText: "buy buy buy buy buy buy buy buy buy buy buy" };
+      const spamDto = {
+        ...dto,
+        reviewText: "buy buy buy buy buy buy buy buy buy buy buy",
+      };
       repo.create.mockImplementation((data) => data);
       repo.save.mockImplementation((data) => Promise.resolve(data));
 
@@ -83,13 +95,17 @@ describe("AgentReviewsService", () => {
 
   describe("addDeveloperResponse", () => {
     it("adds developer response to review", async () => {
-      const review = { id: "r1", developerResponse: null, developerRespondedAt: null };
+      const review = {
+        id: "r1",
+        developerResponse: null,
+        developerRespondedAt: null,
+      };
       repo.findOne.mockResolvedValue(review);
       repo.save.mockImplementation((r) => Promise.resolve(r));
 
-      const result = await service.addDeveloperResponse(
-        "r1", "dev-1", { response: "Thanks!" }
-      );
+      const result = await service.addDeveloperResponse("r1", "dev-1", {
+        response: "Thanks!",
+      });
       expect(result.developerResponse).toBe("Thanks!");
       expect(result.developerRespondedAt).toBeInstanceOf(Date);
     });
@@ -104,7 +120,11 @@ describe("AgentReviewsService", () => {
 
   describe("moderateReview", () => {
     it("updates review status and note", async () => {
-      const review = { id: "r1", status: ReviewStatus.PENDING, moderationNote: null };
+      const review = {
+        id: "r1",
+        status: ReviewStatus.PENDING,
+        moderationNote: null,
+      };
       repo.findOne.mockResolvedValue(review);
       repo.save.mockImplementation((r) => Promise.resolve(r));
 

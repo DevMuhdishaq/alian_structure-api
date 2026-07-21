@@ -292,6 +292,3 @@ export class DashboardMetricsService {
     return register.contentType;
   }
 }
-
-
-

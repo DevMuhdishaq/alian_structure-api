@@ -35,6 +35,3 @@ export class ObservabilityModule implements NestModule {
     consumer.apply(RequestTimingMiddleware).forRoutes("*");
   }
 }
-
-
-

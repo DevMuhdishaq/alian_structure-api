@@ -273,6 +273,3 @@ export class RequestTimingMiddleware implements NestMiddleware {
     return Array.from(this.activeRequests.values());
   }
 }
-
-
-

@@ -62,7 +62,9 @@ export class SimulatorController {
   }
 
   @Get(":id/report")
-  @ApiOperation({ summary: "Get simulation report (gas, comparison, actions summary)" })
+  @ApiOperation({
+    summary: "Get simulation report (gas, comparison, actions summary)",
+  })
   getReport(@Request() req, @Param("id", ParseUUIDPipe) id: string) {
     return this.simulatorService.getReport(id, req.user.id);
   }

@@ -47,7 +47,11 @@ export class OAuthController {
     @Param("provider") provider: string,
     @Body() dto: OAuthCallbackDto,
   ) {
-    return this.oauthStrategy.authenticate({ provider, code: dto.code, state: dto.state });
+    return this.oauthStrategy.authenticate({
+      provider,
+      code: dto.code,
+      state: dto.state,
+    });
   }
 
   @Post(":provider/link")
@@ -55,7 +59,10 @@ export class OAuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: "Link a social provider to your existing account" })
   @ApiParam({ name: "provider", enum: ["google", "github", "twitter"] })
-  @ApiResponse({ status: 200, description: "Social account linked successfully" })
+  @ApiResponse({
+    status: 200,
+    description: "Social account linked successfully",
+  })
   async linkProvider(
     @Param("provider") provider: string,
     @Body() dto: OAuthLinkDto,
@@ -70,11 +77,11 @@ export class OAuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: "Unlink a social provider from your account" })
   @ApiParam({ name: "provider", enum: ["google", "github", "twitter"] })
-  @ApiResponse({ status: 200, description: "Social account unlinked successfully" })
-  async unlinkProvider(
-    @Param("provider") provider: string,
-    @Request() req,
-  ) {
+  @ApiResponse({
+    status: 200,
+    description: "Social account unlinked successfully",
+  })
+  async unlinkProvider(@Param("provider") provider: string, @Request() req) {
     const userId = req.user.sub || req.user.id;
     return this.oauthStrategy.unlinkProvider(userId, provider);
   }

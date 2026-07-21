@@ -95,7 +95,7 @@ describe("WalletAuthService", () => {
     referredById: null,
     referredBy: null,
     referrals: [],
-        socialAccounts: [],
+    socialAccounts: [],
   };
 
   const mockChallengeService = {
@@ -409,6 +409,3 @@ describe("WalletAuthService", () => {
     });
   });
 });
-
-
-

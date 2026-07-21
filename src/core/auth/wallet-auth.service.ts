@@ -199,14 +199,14 @@ export class WalletAuthService {
     user: User | null,
     twoFactorVerified: boolean,
   ): string {
-      const payload: AuthPayload = {
-        address: address.toLowerCase(),
-        email: user?.emailVerified ? user.email : undefined,
-        role: user?.role || "user",
-        tier: resolveRateLimitTierFromRole(user?.role),
-        twoFactorVerified,
-        iat: Math.floor(Date.now() / 1000),
-      };
+    const payload: AuthPayload = {
+      address: address.toLowerCase(),
+      email: user?.emailVerified ? user.email : undefined,
+      role: user?.role || "user",
+      tier: resolveRateLimitTierFromRole(user?.role),
+      twoFactorVerified,
+      iat: Math.floor(Date.now() / 1000),
+    };
 
     return this.jwtService.sign(payload);
   }
@@ -554,5 +554,3 @@ export class WalletAuthService {
     };
   }
 }
-
-

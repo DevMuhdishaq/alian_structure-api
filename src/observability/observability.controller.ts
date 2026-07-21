@@ -186,6 +186,3 @@ export class ObservabilityController {
     return timingSafeEqual(bufA, bufB);
   }
 }
-
-
-

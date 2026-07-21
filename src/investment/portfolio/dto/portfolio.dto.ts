@@ -9,7 +9,11 @@ import {
   Min,
   Max,
 } from "class-validator";
-import { PortfolioType, PortfolioStatus, AllocationStrategy } from "../entities/portfolio.entity";
+import {
+  PortfolioType,
+  PortfolioStatus,
+  AllocationStrategy,
+} from "../entities/portfolio.entity";
 export class CreatePortfolioDto {
   @IsString()
   name: string;
@@ -128,6 +132,3 @@ export class PortfolioResponseDto {
   createdAt: Date;
   updatedAt: Date;
 }
-
-
-

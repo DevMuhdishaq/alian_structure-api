@@ -18,9 +18,7 @@ import {
 import { ChallengeService } from "src/core/auth/challenge.service";
 import { User } from "src/core/user/entities/user.entity";
 import { Wallet } from "src/core/auth/entities/wallet.entity";
-import {
-  resolveRateLimitTierFromRole,
-} from "src/config/quota.config";
+import { resolveRateLimitTierFromRole } from "src/config/quota.config";
 
 /**
  * Wallet-based authentication strategy
@@ -136,5 +134,3 @@ export class WalletStrategy implements AuthStrategy {
     }
   }
 }
-
-

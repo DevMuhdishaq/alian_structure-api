@@ -37,9 +37,7 @@ export class QuotaGuard implements CanActivate {
   private readonly windows = new Map<string, RateWindowState>();
   private lastCleanupAt = Date.now();
 
-  constructor(
-    private readonly reflector: Reflector,
-  ) {}
+  constructor(private readonly reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const options = this.reflector.getAllAndOverride<RateLimitOptions>(
@@ -56,12 +54,7 @@ export class QuotaGuard implements CanActivate {
     const key = `${tracker}:${scope}:${policy.tier}`;
 
     const decision = this.consume(key, policy.limit, policy.windowMs);
-    this.applyHeaders(
-      response,
-      policy,
-      decision.remaining,
-      decision.resetAt,
-    );
+    this.applyHeaders(response, policy, decision.remaining, decision.resetAt);
 
     if (!decision.allowed) {
       throw new HttpException(
@@ -123,7 +116,12 @@ export class QuotaGuard implements CanActivate {
 
   private resolveRequestTier(request: {
     authType?: string;
-    user?: { id?: string | number; role?: string; tier?: string; type?: string };
+    user?: {
+      id?: string | number;
+      role?: string;
+      tier?: string;
+      type?: string;
+    };
   }): RateLimitTier {
     const explicitTier = request.user?.tier;
     const authType = request.authType ?? request.user?.type;

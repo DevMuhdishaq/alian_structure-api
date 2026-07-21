@@ -43,7 +43,7 @@ describe("AuthService", () => {
     referredById: null,
     referredBy: null,
     referrals: [],
-        socialAccounts: [],
+    socialAccounts: [],
   };
 
   const mockJwtService = {
@@ -262,6 +262,3 @@ describe("AuthService", () => {
     });
   });
 });
-
-
-

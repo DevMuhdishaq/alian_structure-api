@@ -274,6 +274,3 @@ export class EnvironmentVariables {
   @Transform(({ value }) => value === "true")
   REFERRAL_ENABLE_VPN_DETECTION?: boolean = false;
 }
-
-
-
