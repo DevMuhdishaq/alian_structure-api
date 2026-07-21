@@ -97,7 +97,6 @@ export class PortfolioService {
     dto: CreatePortfolioDto,
   ): Promise<Portfolio> {
     this.validatePortfolioName(dto.name);
-    this.validateAllocation(dto.initialAllocation);
 
     const existingPortfolio = await this.portfolioRepository.findOne({
       where: { name: dto.name, userId },
@@ -150,21 +149,6 @@ export class PortfolioService {
 
     if (dto.name && dto.name !== portfolio.name) {
       this.validatePortfolioName(dto.name);
-    }
-
-    if (dto.initialAllocation) {
-      this.validateAllocation(dto.initialAllocation);
-      portfolio.initialAllocation = dto.initialAllocation;
-    }
-
-    if (dto.currentAllocation) {
-      this.validateAllocation(dto.currentAllocation);
-      portfolio.currentAllocation = dto.currentAllocation;
-    }
-
-    if (dto.targetAllocation) {
-      this.validateAllocation(dto.targetAllocation);
-      portfolio.targetAllocation = dto.targetAllocation;
     }
 
     if (dto.status === PortfolioStatus.ARCHIVED) {

@@ -23,6 +23,7 @@ import {
   ProvenanceStatus,
 } from "src/infrastructure/audit/entities/provenance-record.entity";
 import { resolveRateLimitTierFromRole } from "src/config/quota.config";
+import { normalizeRole } from "src/common/guard/roles.enum";
 
 export interface AuthPayload {
   address: string;
@@ -125,7 +126,7 @@ export class WalletAuthService {
       const payload: AuthPayload = {
         address: normalized,
         email: user?.emailVerified ? user.email : undefined,
-        role: user?.role || "user",
+        role: normalizeRole(user?.role),
         tier: resolveRateLimitTierFromRole(user?.role),
         iat: Math.floor(Date.now() / 1000),
       };
@@ -202,7 +203,7 @@ export class WalletAuthService {
     const payload: AuthPayload = {
       address: address.toLowerCase(),
       email: user?.emailVerified ? user.email : undefined,
-      role: user?.role || "user",
+      role: normalizeRole(user?.role),
       tier: resolveRateLimitTierFromRole(user?.role),
       twoFactorVerified,
       iat: Math.floor(Date.now() / 1000),

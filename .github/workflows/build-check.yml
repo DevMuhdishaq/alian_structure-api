@@ -25,3 +25,59 @@ jobs:
       
       - name: Build project
         run: npm run build
+
+  openapi:
+    name: Generate OpenAPI Spec & TypeScript Client
+    runs-on: ubuntu-latest
+    # Only run on pushes to main/master (not PRs) to avoid redundant artifact uploads.
+    if: github.event_name == 'push'
+    needs: build
+    env:
+      NODE_ENV: development
+      # Provide minimal env vars so the app can bootstrap without a real DB.
+      # The export script boots with abortOnError:false so it tolerates DB absence.
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/openapi_gen
+      JWT_SECRET: ci-openapi-export-secret
+      PORT: 3001
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Export OpenAPI JSON
+        run: npm run openapi:export
+
+      - name: Set up Java (required by OpenAPI Generator CLI)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Generate TypeScript fetch client
+        run: |
+          npx @openapitools/openapi-generator-cli@2.13.4 generate \
+            -i docs/openapi.json \
+            -g typescript-fetch \
+            -o client \
+            --additional-properties=supportsES6=true,typescriptThreePlus=true
+
+      - name: Upload OpenAPI JSON artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi-spec
+          path: docs/openapi.json
+          retention-days: 30
+
+      - name: Upload TypeScript client artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: typescript-client
+          path: client/
+          retention-days: 30

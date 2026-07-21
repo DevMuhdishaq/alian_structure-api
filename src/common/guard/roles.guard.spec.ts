@@ -147,6 +147,26 @@ describe("RolesGuard", () => {
     });
   });
 
+  describe("legacy lowercase claim compatibility", () => {
+    it("authorizes a legacy lowercase 'admin' claim against @Roles(Role.ADMIN)", () => {
+      jest.spyOn(reflector, "getAllAndOverride").mockReturnValue([Role.ADMIN]);
+      const context = createMockContext({ address: "0x123", role: "admin" });
+      expect(guard.canActivate(context)).toBe(true);
+    });
+
+    it("authorizes a legacy lowercase 'operator' claim via the hierarchy", () => {
+      jest.spyOn(reflector, "getAllAndOverride").mockReturnValue([Role.USER]);
+      const context = createMockContext({ address: "0x123", role: "operator" });
+      expect(guard.canActivate(context)).toBe(true);
+    });
+
+    it("treats an unknown/missing claim as read-only USER and denies admin routes", () => {
+      jest.spyOn(reflector, "getAllAndOverride").mockReturnValue([Role.ADMIN]);
+      const context = createMockContext({ address: "0x123", role: "banana" });
+      expect(() => guard.canActivate(context)).toThrow(ForbiddenException);
+    });
+  });
+
   describe("reflector integration", () => {
     it("should check both handler and class for roles metadata", () => {
       const spy = jest

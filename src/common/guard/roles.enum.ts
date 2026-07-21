@@ -7,6 +7,32 @@ export enum Role {
 }
 
 /**
+ * Every role value the system recognises, indexed by its canonical name.
+ * Used by {@link normalizeRole} to coerce arbitrary input to a canonical Role.
+ */
+const ROLE_VALUES: Role[] = Object.values(Role);
+
+/**
+ * Coerce an arbitrary role value into a canonical {@link Role}.
+ *
+ * This is the single point of backwards compatibility for RBAC. Historically
+ * roles were persisted and signed into JWTs in lowercase (e.g. "admin",
+ * "kyc_operator"); the canonical form is now UPPERCASE. This function accepts
+ * either casing (and surrounding whitespace) and maps it to the canonical enum.
+ *
+ * Unknown, empty, or missing values map to {@link Role.USER} — the least
+ * privileged role — so tokens minted before roles existed default to
+ * read-only access rather than being rejected or over-privileged.
+ */
+export function normalizeRole(value?: string | null): Role {
+  const normalized = String(value ?? "")
+    .trim()
+    .toUpperCase();
+
+  return ROLE_VALUES.find((role) => role === normalized) ?? Role.USER;
+}
+
+/**
  * Linear privilege hierarchy for standard roles.
  * GOVERNANCE_OPERATOR and KYC_OPERATOR are intentionally excluded from this
  * hierarchy — they are mutually exclusive specialised roles that do not

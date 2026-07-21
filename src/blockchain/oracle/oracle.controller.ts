@@ -11,6 +11,14 @@ import {
   HttpStatus,
   Logger,
 } from "@nestjs/common";
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+} from "@nestjs/swagger";
 import { OracleService } from "./services/oracle.service";
 import { JwtAuthGuard } from "src/core/auth/jwt.guard";
 import { CreatePayloadDto } from "./dto/create-payload.dto";
@@ -24,6 +32,7 @@ import { PayloadStatus } from "./entities/signed-payload.entity";
  * Controller for Oracle service endpoints
  * Handles payload creation, signing, and submission
  */
+@ApiTags("Oracle")
 @Controller("oracle")
 export class OracleController {
   private readonly logger = new Logger(OracleController.name);
@@ -36,7 +45,12 @@ export class OracleController {
    */
   @Post("payloads")
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth("JWT-auth")
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: "Create a new payload", description: "Create a new payload ready for signing. Requires JWT authentication." })
+  @ApiResponse({ status: 201, description: "Payload created", type: PayloadResponseDto })
+  @ApiResponse({ status: 400, description: "Invalid payload data" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
   async createPayload(
     @Request() req,
     @Body() createPayloadDto: CreatePayloadDto,
@@ -56,7 +70,13 @@ export class OracleController {
    */
   @Post("payloads/:id/sign")
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth("JWT-auth")
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Sign a payload", description: "Sign a payload with a private key. **Use client-side signing in production.**" })
+  @ApiParam({ name: "id", description: "Payload UUID" })
+  @ApiResponse({ status: 200, description: "Payload signed", type: PayloadResponseDto })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  @ApiResponse({ status: 404, description: "Payload not found" })
   async signPayload(
     @Param("id") id: string,
     @Body() signPayloadDto: SignPayloadDto,
@@ -72,7 +92,13 @@ export class OracleController {
    */
   @Post("payloads/:id/submit")
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth("JWT-auth")
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Submit payload on-chain", description: "Submit a fully signed payload to the blockchain." })
+  @ApiParam({ name: "id", description: "Payload UUID" })
+  @ApiResponse({ status: 200, description: "Payload submitted", schema: { type: "object", properties: { transactionHash: { type: "string" }, payload: { $ref: "#/components/schemas/PayloadResponseDto" } } } })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  @ApiResponse({ status: 404, description: "Payload not found" })
   async submitPayload(
     @Param("id") id: string,
   ): Promise<{ transactionHash: string; payload: PayloadResponseDto }> {
@@ -86,7 +112,13 @@ export class OracleController {
    */
   @Post("payloads/:id/retry")
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth("JWT-auth")
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Retry failed submission", description: "Retry submitting a payload that previously failed." })
+  @ApiParam({ name: "id", description: "Payload UUID" })
+  @ApiResponse({ status: 200, description: "Retry initiated", schema: { type: "object", properties: { transactionHash: { type: "string" }, payload: { $ref: "#/components/schemas/PayloadResponseDto" } } } })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  @ApiResponse({ status: 404, description: "Payload not found" })
   async retrySubmission(
     @Param("id") id: string,
   ): Promise<{ transactionHash: string; payload: PayloadResponseDto }> {
@@ -100,6 +132,8 @@ export class OracleController {
    */
   @Post("verify-signature")
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Verify signature off-chain", description: "Verify an ECDSA signature against a payload and expected signer address." })
+  @ApiResponse({ status: 200, description: "Verification result", schema: { type: "object", properties: { valid: { type: "boolean" }, message: { type: "string" } } } })
   async verifySignature(
     @Body() verifySignatureDto: VerifySignatureDto,
   ): Promise<{ valid: boolean; message: string }> {
@@ -116,6 +150,11 @@ export class OracleController {
    */
   @Get("payloads/:id/verify")
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Verify payload signature", description: "Check whether the stored signature on a payload is valid for a given signer." })
+  @ApiParam({ name: "id", description: "Payload UUID" })
+  @ApiQuery({ name: "expectedSigner", description: "Ethereum address of the expected signer", required: false })
+  @ApiResponse({ status: 200, description: "Verification result", schema: { type: "object", properties: { valid: { type: "boolean" }, payloadId: { type: "string" } } } })
+  @ApiResponse({ status: 404, description: "Payload not found" })
   async verifyPayloadSignature(
     @Param("id") id: string,
     @Query("expectedSigner") expectedSigner: string,
@@ -135,6 +174,12 @@ export class OracleController {
    */
   @Get("payloads/:id")
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({ summary: "Get payload by ID" })
+  @ApiParam({ name: "id", description: "Payload UUID" })
+  @ApiResponse({ status: 200, description: "Payload found", type: PayloadResponseDto })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  @ApiResponse({ status: 404, description: "Payload not found" })
   async getPayload(@Param("id") id: string): Promise<PayloadResponseDto> {
     return this.oracleService.getPayload(id);
   }
@@ -144,6 +189,12 @@ export class OracleController {
    */
   @Get("my-payloads")
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({ summary: "Get my payloads", description: "Retrieve all payloads belonging to the authenticated wallet address." })
+  @ApiQuery({ name: "status", enum: PayloadStatus, required: false, description: "Filter by submission status" })
+  @ApiQuery({ name: "limit", required: false, description: "Max results to return (default 50)", type: Number })
+  @ApiResponse({ status: 200, description: "List of payloads", type: [PayloadResponseDto] })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
   async getMyPayloads(
     @Request() req,
     @Query("status") status?: PayloadStatus,
@@ -167,6 +218,11 @@ export class OracleController {
    * Get payloads for a specific address (public endpoint)
    */
   @Get("payloads/address/:address")
+  @ApiOperation({ summary: "Get payloads by address", description: "Retrieve payloads submitted by a specific Ethereum address (public)." })
+  @ApiParam({ name: "address", description: "Ethereum wallet address" })
+  @ApiQuery({ name: "status", enum: PayloadStatus, required: false })
+  @ApiQuery({ name: "limit", required: false, type: Number })
+  @ApiResponse({ status: 200, description: "List of payloads", type: [PayloadResponseDto] })
   async getPayloadsForAddress(
     @Param("address") address: string,
     @Query("status") status?: PayloadStatus,
@@ -186,6 +242,11 @@ export class OracleController {
    */
   @Get("payloads/pending/ready")
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({ summary: "Get pending payloads", description: "Retrieve signed payloads that are ready for on-chain submission." })
+  @ApiQuery({ name: "limit", required: false, type: Number, description: "Max results (default 100)" })
+  @ApiResponse({ status: 200, description: "List of pending payloads", type: [PayloadResponseDto] })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
   async getPendingPayloads(
     @Query("limit") limit?: number,
   ): Promise<PayloadResponseDto[]> {
@@ -198,6 +259,9 @@ export class OracleController {
    * Get current nonce for an address
    */
   @Get("nonce/:address")
+  @ApiOperation({ summary: "Get nonce for address", description: "Retrieve the current submission nonce for an Ethereum address." })
+  @ApiParam({ name: "address", description: "Ethereum wallet address" })
+  @ApiResponse({ status: 200, description: "Current nonce", schema: { type: "object", properties: { address: { type: "string" }, nonce: { type: "string" } } } })
   async getCurrentNonce(@Param("address") address: string): Promise<{
     address: string;
     nonce: string;
@@ -215,6 +279,10 @@ export class OracleController {
    */
   @Get("my-nonce")
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth("JWT-auth")
+  @ApiOperation({ summary: "Get my nonce", description: "Retrieve the current submission nonce for the authenticated wallet address." })
+  @ApiResponse({ status: 200, description: "Current nonce", schema: { type: "object", properties: { address: { type: "string" }, nonce: { type: "string" } } } })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
   async getMyNonce(@Request() req): Promise<{
     address: string;
     nonce: string;
@@ -232,6 +300,8 @@ export class OracleController {
    * Get Oracle service statistics
    */
   @Get("stats")
+  @ApiOperation({ summary: "Get Oracle statistics", description: "Retrieve aggregate statistics about oracle submissions and payload statuses." })
+  @ApiResponse({ status: 200, description: "Oracle statistics" })
   async getStatistics(): Promise<any> {
     return this.oracleService.getStatistics();
   }
@@ -240,6 +310,8 @@ export class OracleController {
    * Health check endpoint
    */
   @Get("health")
+  @ApiOperation({ summary: "Oracle health check" })
+  @ApiResponse({ status: 200, description: "Service is healthy", schema: { type: "object", properties: { status: { type: "string" }, timestamp: { type: "string" }, service: { type: "string" } } } })
   async healthCheck(): Promise<{
     status: string;
     timestamp: string;

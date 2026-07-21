@@ -34,7 +34,9 @@
     "seed:audit": "ts-node src/seeds/seed-audit-data.ts",
     "docs:generate": "nest start --watch",
     "docs:serve": "nest start",
-    "docs:build": "nest build && node dist/main.js"
+    "docs:build": "nest build && node dist/main.js",
+    "openapi:export": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register scripts/export-openapi.ts",
+    "openapi:client": "npm run openapi:export && npx @openapitools/openapi-generator-cli generate -i docs/openapi.json -g typescript-fetch -o client --additional-properties=supportsES6=true,typescriptThreePlus=true"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.1",
@@ -127,6 +129,7 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^5.1.2",
     "jest": "^29.7.0",
+    "cross-env": "^7.0.3",
     "nodemon": "^3.1.11",
     "pg": "^8.22.0",
     "pino-pretty": "^13.1.3",

@@ -21,11 +21,11 @@ import { JwtAuthGuard } from "src/core/auth/jwt.guard";
 import { PortfolioOwnerGuard } from "./guards/portfolio-owner.guard";
 import { PortfolioService } from "./services/portfolio.service";
 import {
-  CreatePortfolioRequestDto,
-  PortfolioListResponseDto,
+  CreatePortfolioDto,
+  UpdatePortfolioDto,
   PortfolioResponseDto,
-  UpdatePortfolioRequestDto,
-} from "./dto/portfolio-management.dto";
+  PortfolioListResponseDto,
+} from "./dto/portfolio.dto";
 import { ApiErrorDto } from "./dto/api-error.dto";
 import { PortfolioStatus } from "./entities/portfolio.entity";
 
@@ -56,9 +56,9 @@ export class PortfolioManagementController {
   @HttpCode(HttpStatus.CREATED)
   async createPortfolio(
     @Request() req: any,
-    @Body() dto: CreatePortfolioRequestDto,
+    @Body() createPortfolioDto: CreatePortfolioDto,
   ): Promise<PortfolioResponseDto> {
-    return this.portfolioService.createPortfolio(req.user.id, dto as any);
+    return this.portfolioService.createPortfolio(req.user.id, createPortfolioDto);
   }
 
   @Get(":id")
@@ -128,9 +128,9 @@ export class PortfolioManagementController {
   })
   async updatePortfolio(
     @Param("id") id: string,
-    @Body() dto: UpdatePortfolioRequestDto,
+    @Body() updatePortfolioDto: UpdatePortfolioDto,
   ): Promise<PortfolioResponseDto> {
-    return this.portfolioService.updatePortfolio(id, dto as any) as any;
+    return this.portfolioService.updatePortfolio(id, updatePortfolioDto);
   }
 
   @Delete(":id")
