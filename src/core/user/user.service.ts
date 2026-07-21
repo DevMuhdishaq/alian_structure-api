@@ -8,11 +8,15 @@ import { Repository } from "typeorm";
 import { User } from "./entities/user.entity";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { UserRole } from "./entities/user.entity";
+import { Role } from "src/common/guard/roles.enum";
 
-/** Pairs of roles that are mutually exclusive */
-const CONFLICTING_ROLE_PAIRS: [UserRole, UserRole][] = [
-  [UserRole.ADMIN, UserRole.KYC_OPERATOR],
+/**
+ * Pairs of roles that are mutually exclusive and must never be held together.
+ * ADMIN and KYC_OPERATOR are kept separate to preserve separation of duties:
+ * the account that manages the platform must not also sign off on KYC reviews.
+ */
+const CONFLICTING_ROLE_PAIRS: [Role, Role][] = [
+  [Role.ADMIN, Role.KYC_OPERATOR],
 ];
 
 @Injectable()
@@ -34,6 +38,18 @@ export class UserService {
     return this.userRepository.findOne({ where: { id } });
   }
 
+  /**
+   * Like {@link findOne} but throws {@link NotFoundException} when the user
+   * does not exist, so callers can rely on a non-null result.
+   */
+  async findOneOrFail(id: string): Promise<User> {
+    const user = await this.findOne(id);
+    if (!user) {
+      throw new NotFoundException(`User ${id} not found`);
+    }
+    return user;
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto) {
     await this.userRepository.update(id, updateUserDto);
     return this.findOne(id);
@@ -44,15 +60,12 @@ export class UserService {
   }
 
   /**
-   * Assign a role to a user. Enforces mutual exclusion between
-   * GOVERNANCE_OPERATOR and KYC_OPERATOR — assigning one while the
-   * other is already held throws a BadRequestException.
+   * Assign a role to a user. Enforces the mutually-exclusive role pairs in
+   * {@link CONFLICTING_ROLE_PAIRS} — assigning a role that conflicts with the
+   * user's current role throws a BadRequestException.
    */
-  async assignRole(userId: string, newRole: UserRole): Promise<User> {
-    const user = await this.findOne(userId);
-    if (!user) {
-      throw new NotFoundException(`User ${userId} not found`);
-    }
+  async assignRole(userId: string, newRole: Role): Promise<User> {
+    const user = await this.findOneOrFail(userId);
 
     this.assertNoRoleConflict(user.role, newRole);
 
@@ -64,7 +77,7 @@ export class UserService {
    * Throws BadRequestException if assigning `newRole` to a user that
    * currently holds `currentRole` would create a conflicting pair.
    */
-  assertNoRoleConflict(currentRole: UserRole, newRole: UserRole): void {
+  assertNoRoleConflict(currentRole: Role, newRole: Role): void {
     if (currentRole === newRole) return;
 
     const conflict = CONFLICTING_ROLE_PAIRS.some(
@@ -76,7 +89,7 @@ export class UserService {
     if (conflict) {
       throw new BadRequestException(
         `Role conflict: a user cannot hold both "${currentRole}" and "${newRole}". ` +
-          `GOVERNANCE_OPERATOR and KYC_OPERATOR are mutually exclusive roles.`,
+          `These roles are mutually exclusive to preserve separation of duties.`,
       );
     }
   }

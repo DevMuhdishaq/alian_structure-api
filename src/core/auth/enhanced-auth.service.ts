@@ -19,6 +19,7 @@ import * as qrcode from "qrcode";
 import { EmailService } from "./email.service";
 import { User } from "src/core/user/entities/user.entity";
 import { resolveRateLimitTierFromRole } from "src/config/quota.config";
+import { normalizeRole } from "src/common/guard/roles.enum";
 import {
   RefreshToken,
   TwoFactorAuth,
@@ -124,7 +125,7 @@ export class EnhancedAuthService {
         id: user.id,
         email: user.email,
         username: user.username,
-        role: user.role,
+        role: normalizeRole(user.role),
         tier: resolveRateLimitTierFromRole(user.role),
         kycStatus: user.kycStatus,
       },
@@ -188,7 +189,7 @@ export class EnhancedAuthService {
         id: user.id,
         email: user.email,
         username: user.username,
-        role: user.role,
+        role: normalizeRole(user.role),
         tier: resolveRateLimitTierFromRole(user.role),
         kycStatus: user.kycStatus,
       },
@@ -556,7 +557,7 @@ export class EnhancedAuthService {
       sub: user.id,
       email: user.email,
       username: user.username,
-      role: user.role,
+      role: normalizeRole(user.role),
       tier: resolveRateLimitTierFromRole(user.role),
       twoFactorVerified,
     };

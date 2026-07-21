@@ -4,6 +4,7 @@ import { ConfigService } from "@nestjs/config";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { AuthPayload } from "./wallet-auth.service";
 import { TokenBlacklistService } from "./token-blacklist.service";
+import { normalizeRole } from "src/common/guard/roles.enum";
 
 interface JwtPayload {
   sub?: string; // User ID for traditional auth
@@ -62,6 +63,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       );
     }
 
+    // Coerce the (possibly legacy lowercase or missing) role claim into the
+    // canonical UPPERCASE Role so downstream guards compare consistently.
+    // Missing/unknown claims map to Role.USER (least privilege).
+    const role = normalizeRole(payload.role);
+
     // Return user object compatible with both auth types
     if (isTraditionalAuth) {
       return {
@@ -69,7 +75,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         sub: payload.sub,
         email: payload.email,
         username: payload.username,
-        role: payload.role || "user",
+        role,
+        roles: [role],
         tier: payload.tier,
         jti: payload.jti,
         twoFactorVerified: payload.twoFactorVerified ?? false,
@@ -80,9 +87,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       return {
         address: payload.address,
         email: payload.email,
-        role: payload.role || "user",
+        role,
         tier: payload.tier,
-        roles: payload.role ? [payload.role] : ["user"],
+        roles: [role],
         jti: payload.jti,
         twoFactorVerified: payload.twoFactorVerified ?? false,
         exp: payload.exp,

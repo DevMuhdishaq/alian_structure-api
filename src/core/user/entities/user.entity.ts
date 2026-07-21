@@ -12,12 +12,18 @@ import {
 } from "typeorm";
 import { ProvenanceRecord } from "src/infrastructure/audit/entities/provenance-record.entity";
 import { Wallet } from "src/core/auth/entities/wallet.entity";
+import { Role, normalizeRole } from "src/common/guard/roles.enum";
 
-export enum UserRole {
-  USER = "user",
-  KYC_OPERATOR = "kyc_operator",
-  ADMIN = "admin",
-}
+/**
+ * @deprecated Use the canonical {@link Role} enum from
+ * `src/common/guard/roles.enum` instead. `UserRole` is retained as an alias
+ * for backwards compatibility with existing imports; it now resolves to the
+ * same UPPERCASE-valued enum used by RolesGuard and the JWT claims. Legacy
+ * lowercase values stored in the database are coerced on read via
+ * {@link normalizeRole}.
+ */
+export const UserRole = Role;
+export type UserRole = Role;
 
 export enum KycStatus {
   UNVERIFIED = "unverified",
@@ -49,9 +55,15 @@ export class User {
 
   @Column({
     type: "varchar",
-    default: UserRole.USER,
+    default: Role.USER,
+    // Coerce legacy lowercase values (e.g. "admin") persisted before the
+    // RBAC canonicalisation into the canonical UPPERCASE Role on read.
+    transformer: {
+      to: (value?: Role) => value ?? Role.USER,
+      from: (value?: string | null) => normalizeRole(value),
+    },
   })
-  role: UserRole;
+  role: Role;
 
   @Column({
     type: "varchar",

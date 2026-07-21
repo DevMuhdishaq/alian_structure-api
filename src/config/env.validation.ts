@@ -39,6 +39,17 @@ export class EnvironmentVariables {
   @IsNotEmpty()
   JWT_SECRET: string;
 
+  // RBAC bootstrap: promote the account matching one of these to ADMIN on
+  // startup so a fresh deployment has an initial administrator. Optional —
+  // when both are unset no seeding occurs. See docs/RBAC.md.
+  @IsOptional()
+  @IsString()
+  ADMIN_BOOTSTRAP_EMAIL?: string;
+
+  @IsOptional()
+  @IsString()
+  ADMIN_BOOTSTRAP_WALLET?: string;
+
   @IsString()
   @IsNotEmpty()
   JWT_EXPIRATION: string = "24h";
