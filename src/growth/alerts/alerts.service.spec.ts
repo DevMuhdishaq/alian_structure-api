@@ -504,6 +504,3 @@ describe("AlertsService", () => {
     });
   });
 });
-
-
-

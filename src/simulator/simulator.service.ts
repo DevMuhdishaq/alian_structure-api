@@ -55,11 +55,14 @@ export class SimulatorService {
     this.rpcUrls[SupportedChain.ETHEREUM] =
       configService.get<string>("ETH_RPC_URL") || "https://eth.llamarpc.com";
     this.rpcUrls[SupportedChain.POLYGON] =
-      configService.get<string>("POLYGON_RPC_URL") || "https://polygon.llamarpc.com";
+      configService.get<string>("POLYGON_RPC_URL") ||
+      "https://polygon.llamarpc.com";
     this.rpcUrls[SupportedChain.ARBITRUM] =
-      configService.get<string>("ARBITRUM_RPC_URL") || "https://arbitrum.llamarpc.com";
+      configService.get<string>("ARBITRUM_RPC_URL") ||
+      "https://arbitrum.llamarpc.com";
     this.rpcUrls[SupportedChain.OPTIMISM] =
-      configService.get<string>("OPTIMISM_RPC_URL") || "https://optimism.llamarpc.com";
+      configService.get<string>("OPTIMISM_RPC_URL") ||
+      "https://optimism.llamarpc.com";
   }
 
   async createSimulation(
@@ -106,8 +109,12 @@ export class SimulatorService {
     });
 
     // Run asynchronously to avoid blocking the HTTP response
-    this.executeSimulation(simulation, dto.agentAddresses ?? [], dto.replayTxHashes ?? []).catch(
-      (err) => this.logger.error(`Simulation ${simulationId} failed: ${err.message}`),
+    this.executeSimulation(
+      simulation,
+      dto.agentAddresses ?? [],
+      dto.replayTxHashes ?? [],
+    ).catch((err) =>
+      this.logger.error(`Simulation ${simulationId} failed: ${err.message}`),
     );
 
     return this.simulationRepo.findOneBy({ id: simulationId });
@@ -131,7 +138,10 @@ export class SimulatorService {
 
       // --- Transaction replay: fetch specific historical txs first ---
       if (replayTxHashes.length > 0) {
-        const replayActions = await this.replayTransactions(provider, replayTxHashes);
+        const replayActions = await this.replayTransactions(
+          provider,
+          replayTxHashes,
+        );
         actions.push(...replayActions);
         replayActions.forEach((a) => (totalGasUsed += a.gasUsed));
       }
@@ -194,10 +204,14 @@ export class SimulatorService {
       const gasReport: GasReport = {
         totalGasUsed,
         averageGasPerBlock:
-          gasBreakdown.length > 0 ? Math.round(totalGasUsed / gasBreakdown.length) : 0,
+          gasBreakdown.length > 0
+            ? Math.round(totalGasUsed / gasBreakdown.length)
+            : 0,
         averageGasPerTx:
           actions.filter((a) => !a.replayed).length > 0
-            ? Math.round(totalGasUsed / actions.filter((a) => !a.replayed).length)
+            ? Math.round(
+                totalGasUsed / actions.filter((a) => !a.replayed).length,
+              )
             : 0,
         totalEstimatedCostEth: formatEther(
           BigInt(totalGasUsed) * 20n * 1_000_000_000n,
@@ -221,7 +235,9 @@ export class SimulatorService {
         blocksProcessed: simulation.blocksToSimulate,
       });
 
-      this.logger.log(`Simulation ${simulation.id} completed in ${durationMs}ms`);
+      this.logger.log(
+        `Simulation ${simulation.id} completed in ${durationMs}ms`,
+      );
     } catch (err) {
       await this.simulationRepo.update(simulation.id, {
         status: SimulationStatus.FAILED,
@@ -264,7 +280,10 @@ export class SimulatorService {
     );
 
     return results
-      .filter((r): r is PromiseFulfilledResult<AgentAction> => r.status === "fulfilled" && r.value !== null)
+      .filter(
+        (r): r is PromiseFulfilledResult<AgentAction> =>
+          r.status === "fulfilled" && r.value !== null,
+      )
       .map((r) => r.value);
   }
 
@@ -285,9 +304,10 @@ export class SimulatorService {
       provider.getBlock(toBlock),
     ]);
 
-    const actualTxCounts = sampleBlocks
-      .filter(Boolean)
-      .map((b) => ({ blockNumber: b!.number, txCount: b!.transactions.length }));
+    const actualTxCounts = sampleBlocks.filter(Boolean).map((b) => ({
+      blockNumber: b!.number,
+      txCount: b!.transactions.length,
+    }));
 
     const replayedCount = simulatedActions.filter((a) => a.replayed).length;
 
@@ -313,7 +333,10 @@ export class SimulatorService {
     return sim;
   }
 
-  async getReport(id: string, userId: string): Promise<Record<string, unknown>> {
+  async getReport(
+    id: string,
+    userId: string,
+  ): Promise<Record<string, unknown>> {
     const sim = await this.findOne(id, userId);
     return {
       id: sim.id,
@@ -334,7 +357,10 @@ export class SimulatorService {
   }
 
   /** Export full simulation data as a structured JSON report */
-  async exportReport(id: string, userId: string): Promise<Record<string, unknown>> {
+  async exportReport(
+    id: string,
+    userId: string,
+  ): Promise<Record<string, unknown>> {
     const sim = await this.findOne(id, userId);
     return {
       exportedAt: new Date().toISOString(),

@@ -183,6 +183,3 @@ describe("AlertEvaluationService", () => {
     });
   });
 });
-
-
-

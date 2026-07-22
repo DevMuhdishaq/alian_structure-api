@@ -40,6 +40,3 @@ export class ProfileController {
     return this.profileService.remove(+id);
   }
 }
-
-
-

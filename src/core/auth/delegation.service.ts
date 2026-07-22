@@ -520,6 +520,3 @@ export class DelegationService {
     );
   }
 }
-
-
-

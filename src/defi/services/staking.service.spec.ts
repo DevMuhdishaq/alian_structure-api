@@ -2,7 +2,12 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { NotFoundException } from "@nestjs/common";
 import { StakingService } from "./staking.service";
-import { DeFiPosition, PositionStatus, PositionType, DeFiProtocol } from "../entities/defi-position.entity";
+import {
+  DeFiPosition,
+  PositionStatus,
+  PositionType,
+  DeFiProtocol,
+} from "../entities/defi-position.entity";
 import { DeFiYieldRecord } from "../entities/defi-yield-record.entity";
 import { ProtocolRegistry } from "../protocols/protocol-registry";
 
@@ -34,10 +39,14 @@ describe("StakingService", () => {
     supportedChains: ["ethereum"],
     stake: jest.fn(),
     getAPY: jest.fn().mockResolvedValue(5.2),
-    getRewards: jest.fn().mockResolvedValue([
-      { token: "ETH", amount: 0.1, valueUSD: 350, apy: 5, claimable: true },
-    ]),
-    getProtocolMetrics: jest.fn().mockResolvedValue({ tvl: 5e9, audits: ["Sigma"], apy: 5 }),
+    getRewards: jest
+      .fn()
+      .mockResolvedValue([
+        { token: "ETH", amount: 0.1, valueUSD: 350, apy: 5, claimable: true },
+      ]),
+    getProtocolMetrics: jest
+      .fn()
+      .mockResolvedValue({ tvl: 5e9, audits: ["Sigma"], apy: 5 }),
   };
 
   beforeEach(async () => {
@@ -92,20 +101,40 @@ describe("StakingService", () => {
 
   describe("unstake", () => {
     it("reduces current_amount and returns updated position", async () => {
-      positionRepo.findOne.mockResolvedValue({ ...mockPosition(), current_amount: 10 });
-      positionRepo.save.mockResolvedValue({ ...mockPosition(), current_amount: 5, status: PositionStatus.ACTIVE });
+      positionRepo.findOne.mockResolvedValue({
+        ...mockPosition(),
+        current_amount: 10,
+      });
+      positionRepo.save.mockResolvedValue({
+        ...mockPosition(),
+        current_amount: 5,
+        status: PositionStatus.ACTIVE,
+      });
 
-      const result = await service.unstake("user-1", { positionId: "pos-1", amount: 5 });
+      const result = await service.unstake("user-1", {
+        positionId: "pos-1",
+        amount: 5,
+      });
       expect(result.currentValue).toBe(5);
     });
 
     it("closes position when all tokens unstaked", async () => {
-      positionRepo.findOne.mockResolvedValue({ ...mockPosition(), current_amount: 10 });
-      positionRepo.save.mockResolvedValue({ ...mockPosition(), current_amount: 0, status: PositionStatus.CLOSED });
+      positionRepo.findOne.mockResolvedValue({
+        ...mockPosition(),
+        current_amount: 10,
+      });
+      positionRepo.save.mockResolvedValue({
+        ...mockPosition(),
+        current_amount: 0,
+        status: PositionStatus.CLOSED,
+      });
 
       await service.unstake("user-1", { positionId: "pos-1", amount: 10 });
       expect(positionRepo.save).toHaveBeenCalledWith(
-        expect.objectContaining({ current_amount: 0, status: PositionStatus.CLOSED }),
+        expect.objectContaining({
+          current_amount: 0,
+          status: PositionStatus.CLOSED,
+        }),
       );
     });
 
@@ -138,14 +167,24 @@ describe("StakingService", () => {
 
   describe("autoCompound", () => {
     it("returns 0 compounded when autoCompound is disabled", async () => {
-      positionRepo.findOne.mockResolvedValue({ ...mockPosition(), auto_compound_enabled: false });
+      positionRepo.findOne.mockResolvedValue({
+        ...mockPosition(),
+        auto_compound_enabled: false,
+      });
       const result = await service.autoCompound("user-1", "pos-1");
       expect(result.compounded).toBe(0);
     });
 
     it("compounds rewards into position when autoCompound is enabled", async () => {
-      positionRepo.findOne.mockResolvedValue({ ...mockPosition(), auto_compound_enabled: true });
-      positionRepo.save.mockResolvedValue({ ...mockPosition(), current_amount: 10.1, auto_compound_enabled: true });
+      positionRepo.findOne.mockResolvedValue({
+        ...mockPosition(),
+        auto_compound_enabled: true,
+      });
+      positionRepo.save.mockResolvedValue({
+        ...mockPosition(),
+        current_amount: 10.1,
+        auto_compound_enabled: true,
+      });
 
       const result = await service.autoCompound("user-1", "pos-1");
       expect(result.compounded).toBe(0.1);
@@ -157,7 +196,10 @@ describe("StakingService", () => {
 
   describe("setAutoCompound", () => {
     it("enables auto-compound on a position", async () => {
-      positionRepo.save.mockResolvedValue({ ...mockPosition(), auto_compound_enabled: true });
+      positionRepo.save.mockResolvedValue({
+        ...mockPosition(),
+        auto_compound_enabled: true,
+      });
       const result = await service.setAutoCompound("user-1", "pos-1", true);
       expect(result.autoCompound).toBe(true);
     });
@@ -166,7 +208,10 @@ describe("StakingService", () => {
   describe("getStakingOpportunities", () => {
     it("returns opportunities only for adapters with stake capability", async () => {
       const adapterNoStake = { ...mockAdapter, stake: undefined };
-      protocolRegistry.getAllAdapters.mockReturnValue([mockAdapter, adapterNoStake]);
+      protocolRegistry.getAllAdapters.mockReturnValue([
+        mockAdapter,
+        adapterNoStake,
+      ]);
 
       const result = await service.getStakingOpportunities(["ETH"]);
       expect(result).toHaveLength(1);

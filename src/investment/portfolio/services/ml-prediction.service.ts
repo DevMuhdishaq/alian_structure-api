@@ -180,6 +180,3 @@ export class MLPredictionService {
     };
   }
 }
-
-
-

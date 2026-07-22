@@ -194,6 +194,3 @@ describe("RequestTimingMiddleware Prometheus integration (issue #25)", () => {
     expect(remaining).toBe(0);
   });
 });
-
-
-

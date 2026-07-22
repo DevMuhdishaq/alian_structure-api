@@ -156,6 +156,3 @@ export interface EventBufferConfig {
   maxAge: number; // Maximum age of buffered events in ms
   flushInterval: number; // Interval to check for expired buffers
 }
-
-
-

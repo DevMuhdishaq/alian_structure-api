@@ -26,14 +26,19 @@ export class CreateSimulationDto {
   @Min(0)
   forkBlockNumber: number;
 
-  @ApiProperty({ description: "Number of blocks to simulate", minimum: 1, maximum: 1000 })
+  @ApiProperty({
+    description: "Number of blocks to simulate",
+    minimum: 1,
+    maximum: 1000,
+  })
   @IsInt()
   @IsPositive()
   @Max(1000)
   blocksToSimulate: number;
 
   @ApiPropertyOptional({
-    description: "Time-scale multiplier — simulate N blocks per real second (default 1). Higher values fast-forward.",
+    description:
+      "Time-scale multiplier — simulate N blocks per real second (default 1). Higher values fast-forward.",
     default: 1,
   })
   @IsOptional()
@@ -43,12 +48,16 @@ export class CreateSimulationDto {
 }
 
 export class RunSimulationDto {
-  @ApiPropertyOptional({ description: "Agent addresses to track during simulation" })
+  @ApiPropertyOptional({
+    description: "Agent addresses to track during simulation",
+  })
   @IsOptional()
   @IsString({ each: true })
   agentAddresses?: string[];
 
-  @ApiPropertyOptional({ description: "Specific tx hashes to replay from historical chain data" })
+  @ApiPropertyOptional({
+    description: "Specific tx hashes to replay from historical chain data",
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })

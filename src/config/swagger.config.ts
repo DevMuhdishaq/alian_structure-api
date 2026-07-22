@@ -90,6 +90,3 @@ export function setupSwagger(app: INestApplication): OpenAPIObject | null {
 
   return document;
 }
-
-
-

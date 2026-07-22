@@ -26,6 +26,3 @@ export class AlertTriggerLog {
   @CreateDateColumn()
   triggeredAt: Date;
 }
-
-
-

@@ -35,11 +35,7 @@ import {
   CompoundRewardsDto,
   StrategyPerformanceDto,
 } from "./dto/yield-strategy.dto";
-import {
-  StakeDto,
-  UnstakeDto,
-  AutoCompoundConfigDto,
-} from "./dto/staking.dto";
+import { StakeDto, UnstakeDto, AutoCompoundConfigDto } from "./dto/staking.dto";
 import { JwtAuthGuard } from "src/core/auth/jwt.guard";
 import { User } from "src/core/user/entities/user.entity";
 import { CurrentUser } from "src/core/auth/decorators";
@@ -482,7 +478,11 @@ export class DeFiController {
     @Param("positionId") positionId: string,
     @Body() dto: AutoCompoundConfigDto,
   ) {
-    return this.stakingService.setAutoCompound(user.id, positionId, dto.enabled);
+    return this.stakingService.setAutoCompound(
+      user.id,
+      positionId,
+      dto.enabled,
+    );
   }
 
   @Get("staking/opportunities")
@@ -491,6 +491,3 @@ export class DeFiController {
     return this.stakingService.getStakingOpportunities(tokenList);
   }
 }
-
-
-

@@ -31,14 +31,19 @@ export class StakingService {
   /**
    * Open a new staking position
    */
-  async stake(userId: string, dto: StakeDto): Promise<StakingPositionResponseDto> {
+  async stake(
+    userId: string,
+    dto: StakeDto,
+  ): Promise<StakingPositionResponseDto> {
     const adapter = this.protocolRegistry.getAdapter(dto.protocol);
 
     let apy = 0;
     try {
       apy = await adapter.getAPY(dto.tokenSymbol);
     } catch (err) {
-      this.logger.warn(`Could not fetch APY for ${dto.protocol}/${dto.tokenSymbol}: ${err}`);
+      this.logger.warn(
+        `Could not fetch APY for ${dto.protocol}/${dto.tokenSymbol}: ${err}`,
+      );
     }
 
     const position = this.positionRepository.create({
@@ -85,7 +90,9 @@ export class StakingService {
   /**
    * Get all staking positions for a user
    */
-  async getStakingPositions(userId: string): Promise<StakingPositionResponseDto[]> {
+  async getStakingPositions(
+    userId: string,
+  ): Promise<StakingPositionResponseDto[]> {
     const positions = await this.positionRepository.find({
       where: { user_id: userId, position_type: PositionType.STAKING },
     });
@@ -128,7 +135,9 @@ export class StakingService {
         }
       }
     } catch (err) {
-      this.logger.warn(`Could not fetch rewards for position ${positionId}: ${err}`);
+      this.logger.warn(
+        `Could not fetch rewards for position ${positionId}: ${err}`,
+      );
     }
 
     position.accumulated_yield =
@@ -166,7 +175,9 @@ export class StakingService {
         }
       }
     } catch (err) {
-      this.logger.warn(`Could not compound rewards for position ${positionId}: ${err}`);
+      this.logger.warn(
+        `Could not compound rewards for position ${positionId}: ${err}`,
+      );
     }
 
     if (totalCompounded > 0) {
@@ -224,7 +235,9 @@ export class StakingService {
       }
     }
 
-    return opportunities.sort((a, b) => b.apy - a.riskScore * 0.1 - (a.apy - b.riskScore * 0.1));
+    return opportunities.sort(
+      (a, b) => b.apy - a.riskScore * 0.1 - (a.apy - b.riskScore * 0.1),
+    );
   }
 
   // ──────────────────────────────────────────────

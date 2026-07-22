@@ -28,6 +28,3 @@ export class EmailVerification {
   @CreateDateColumn()
   createdAt: Date;
 }
-
-
-

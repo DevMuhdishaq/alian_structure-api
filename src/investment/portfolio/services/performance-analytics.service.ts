@@ -611,6 +611,3 @@ export class PerformanceAnalyticsService {
     };
   }
 }
-
-
-

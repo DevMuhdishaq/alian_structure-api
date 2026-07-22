@@ -27,19 +27,13 @@ export class RiskManagementHealthIndicator extends HealthIndicator {
       };
     }
 
-    throw new HealthCheckError(
-      "Risk management circuit breaker is open",
-      {
-        [key]: {
-          status: "down",
-          circuitBreakerState: status.state,
-          failureCount: status.failureCount,
-          lastFailureTime: status.lastFailureTime,
-        },
+    throw new HealthCheckError("Risk management circuit breaker is open", {
+      [key]: {
+        status: "down",
+        circuitBreakerState: status.state,
+        failureCount: status.failureCount,
+        lastFailureTime: status.lastFailureTime,
       },
-    );
+    });
   }
 }
-
-
-

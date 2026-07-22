@@ -148,6 +148,3 @@ export class AuthModule implements OnModuleInit {
     this.strategyRegistry.register(this.apiKeyStrategy);
   }
 }
-
-
-

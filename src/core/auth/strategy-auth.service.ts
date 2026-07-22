@@ -144,6 +144,3 @@ export class StrategyAuthService {
     return this.strategyRegistry.get(strategyName);
   }
 }
-
-
-

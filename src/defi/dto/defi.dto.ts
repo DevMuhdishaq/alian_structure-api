@@ -270,6 +270,3 @@ export class DeFiAnalyticsDto {
   risk_distribution: Record<string, number>;
   performance_chart: Array<{ date: Date; value: number; apy: number }>;
 }
-
-
-

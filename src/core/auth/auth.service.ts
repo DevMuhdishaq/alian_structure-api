@@ -175,9 +175,7 @@ export class AuthService {
     this.tokenBlacklist.revoke(jti, exp * 1000); // exp is in seconds, convert to ms
   }
 
-  async getAuthStatus(
-    user: User,
-  ): Promise<{
+  async getAuthStatus(user: User): Promise<{
     isAuthenticated: boolean;
     user: Partial<User> & { tier?: string };
   }> {
@@ -194,4 +192,3 @@ export class AuthService {
     };
   }
 }
-

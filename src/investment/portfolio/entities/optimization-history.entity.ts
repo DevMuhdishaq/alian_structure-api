@@ -142,6 +142,3 @@ export class OptimizationHistory {
   @Column("uuid")
   portfolioId: string;
 }
-
-
-

@@ -309,6 +309,3 @@ export class PerformanceCalculations {
     };
   }
 }
-
-
-

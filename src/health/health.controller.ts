@@ -95,6 +95,3 @@ export class HealthController {
     return result;
   }
 }
-
-
-

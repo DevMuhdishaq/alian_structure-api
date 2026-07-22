@@ -32,6 +32,3 @@ export class ThrottlerUserIpGuard extends ThrottlerGuard {
     return req.ip ?? "unknown";
   }
 }
-
-
-

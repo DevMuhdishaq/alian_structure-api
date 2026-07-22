@@ -55,7 +55,10 @@ export class PortfolioService {
 
   private validateAllocation(allocation?: Record<string, number>): void {
     if (!allocation) return;
-    const sum = Object.values(allocation).reduce((acc, val) => acc + (val || 0), 0);
+    const sum = Object.values(allocation).reduce(
+      (acc, val) => acc + (val || 0),
+      0,
+    );
     if (Math.abs(sum - 100) > 0.1) {
       throw new BadRequestException(
         `Allocation percentages must sum to 100, got ${sum}`,
@@ -89,7 +92,10 @@ export class PortfolioService {
     return this.portfolioRepository.save(portfolio);
   }
 
-  async createPortfolio(userId: string, dto: CreatePortfolioDto): Promise<Portfolio> {
+  async createPortfolio(
+    userId: string,
+    dto: CreatePortfolioDto,
+  ): Promise<Portfolio> {
     this.validatePortfolioName(dto.name);
 
     const existingPortfolio = await this.portfolioRepository.findOne({
@@ -97,9 +103,7 @@ export class PortfolioService {
     });
 
     if (existingPortfolio && !existingPortfolio.deletedAt) {
-      throw new BadRequestException(
-        "Portfolio with this name already exists",
-      );
+      throw new BadRequestException("Portfolio with this name already exists");
     }
 
     const portfolio = this.portfolioRepository.create({

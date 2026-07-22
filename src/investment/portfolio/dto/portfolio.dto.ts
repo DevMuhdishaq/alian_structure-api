@@ -8,7 +8,6 @@ import {
   IsJSON,
 } from "class-validator";
 import { PortfolioStatus } from "../entities/portfolio.entity";
-
 export class CreatePortfolioDto {
   @ApiProperty({ example: "Retirement Growth" })
   @IsString()

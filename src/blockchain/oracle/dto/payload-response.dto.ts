@@ -62,6 +62,3 @@ export class PayloadResponseDto {
   @ApiPropertyOptional({ description: "When confirmed on-chain", nullable: true })
   confirmedAt: Date | null;
 }
-
-
-

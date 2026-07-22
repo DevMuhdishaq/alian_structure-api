@@ -69,7 +69,12 @@ export class Portfolio {
   @Column({ type: "jsonb", default: {} })
   initialAllocation: Record<string, number>;
 
-  @Column({ type: "enum", enum: AllocationStrategy, default: AllocationStrategy.MANUAL, nullable: true })
+  @Column({
+    type: "enum",
+    enum: AllocationStrategy,
+    default: AllocationStrategy.MANUAL,
+    nullable: true,
+  })
   allocationStrategy: AllocationStrategy;
 
   @Column({ type: "decimal", precision: 18, scale: 2, default: 0 })
@@ -142,6 +147,3 @@ export class Portfolio {
   })
   performanceMetrics: PerformanceMetric[];
 }
-
-
-

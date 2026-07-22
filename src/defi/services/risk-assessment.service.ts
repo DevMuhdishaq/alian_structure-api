@@ -430,6 +430,3 @@ export interface RiskMonitoringResult {
     healthRating: string;
   };
 }
-
-
-

@@ -150,6 +150,3 @@ describe("ObservabilityController - Prometheus /metrics endpoint (issue #25)", (
     });
   });
 });
-
-
-

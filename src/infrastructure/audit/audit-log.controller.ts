@@ -39,7 +39,9 @@ export class AuditLogController {
   })
   @ApiResponse({ status: 200, type: AuditLogListResponseDto })
   @ApiResponse({ status: 403, description: "Forbidden" })
-  async query(@Query() query: QueryAuditLogDto): Promise<AuditLogListResponseDto> {
+  async query(
+    @Query() query: QueryAuditLogDto,
+  ): Promise<AuditLogListResponseDto> {
     return this.auditLogService.query(query);
   }
 

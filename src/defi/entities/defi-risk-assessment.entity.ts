@@ -88,6 +88,3 @@ export class DeFiRiskAssessment {
   @Column("timestamp", { nullable: true })
   effective_until: Date;
 }
-
-
-

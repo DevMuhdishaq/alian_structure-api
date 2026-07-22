@@ -352,6 +352,3 @@ describe("PerformanceAnalyticsService", () => {
     });
   });
 });
-
-
-

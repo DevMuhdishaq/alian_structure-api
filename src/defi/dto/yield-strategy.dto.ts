@@ -181,6 +181,3 @@ export class StrategyPerformanceResponseDto {
   period_start: Date;
   period_end: Date;
 }
-
-
-

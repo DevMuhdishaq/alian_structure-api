@@ -153,6 +153,3 @@ export class CursorPaginationService {
     }
   }
 }
-
-
-

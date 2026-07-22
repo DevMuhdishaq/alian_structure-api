@@ -1,16 +1,22 @@
-import {
-  ExecutionContext,
-  HttpException,
-  HttpStatus,
-} from "@nestjs/common";
+import { ExecutionContext, HttpException, HttpStatus } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { QuotaGuard } from "./quota.guard";
 
 function createContext(options?: {
-  user?: { id?: string; sub?: string; address?: string; role?: string; tier?: string; type?: string };
+  user?: {
+    id?: string;
+    sub?: string;
+    address?: string;
+    role?: string;
+    tier?: string;
+    type?: string;
+  };
   ip?: string;
   originalUrl?: string;
-}): { context: ExecutionContext; response: { header: jest.Mock; setHeader: jest.Mock } } {
+}): {
+  context: ExecutionContext;
+  response: { header: jest.Mock; setHeader: jest.Mock };
+} {
   const request = {
     ip: options?.ip ?? "127.0.0.1",
     headers: {},
@@ -52,10 +58,7 @@ describe("QuotaGuard", () => {
 
     await expect(guard.canActivate(context)).resolves.toBe(true);
     expect(response.header).toHaveBeenCalledWith("X-RateLimit-Limit", 100);
-    expect(response.header).toHaveBeenCalledWith(
-      "X-RateLimit-Remaining",
-      99,
-    );
+    expect(response.header).toHaveBeenCalledWith("X-RateLimit-Remaining", 99);
     expect(response.header).toHaveBeenCalledWith("X-RateLimit-Tier", "free");
   });
 

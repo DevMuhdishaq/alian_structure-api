@@ -72,6 +72,3 @@ export const addBreadcrumb = (breadcrumb: Sentry.Breadcrumb) => {
     Sentry.addBreadcrumb(breadcrumb);
   }
 };
-
-
-
