@@ -100,6 +100,69 @@ endpoint, persists the time series, and Grafana visualises them.
 - **`prometheus/alerts.yml.example`** — starter SLO alerting rules
   (error rate, p95 latency, event-loop lag, memory, regressions).
 
+## Monitoring module (`src/monitoring`)
+
+Beyond the passive HTTP/DB instrumentation above, the `MonitoringModule`
+adds active collection, in-process alerting, historical retention and a
+top-level scrape endpoint. It reuses the **same** Prometheus registry
+(`src/config/metrics.ts`), so everything surfaces on one scrape.
+
+### Endpoints
+
+| Endpoint                              | Purpose                                                        |
+| ------------------------------------- | ------------------------------------------------------------- |
+| `GET /metrics`                        | Prometheus text-exposition (top-level, per acceptance criteria) |
+| `GET /monitoring/health`              | Composite status from resource pressure + active alerts (503 on critical) |
+| `GET /monitoring/system`              | Fresh CPU / memory / disk snapshot                            |
+| `GET /monitoring/alerts`              | Active alerts and all rule states                             |
+| `GET/POST/DELETE /monitoring/alerts/rules` | List / upsert / delete threshold rules                   |
+| `GET /monitoring/history`             | Historical KPI time series (`?since&until&limit`)            |
+| `GET /monitoring/dashboard`           | Aggregated KPI summary for a dashboard UI                     |
+
+> The token gate (`METRICS_AUTH_TOKEN`) protects both `GET /metrics` and
+> the legacy `GET /observability/metrics`.
+
+### Added metrics
+
+| Metric                                          | Type      | Source                    |
+| ----------------------------------------------- | --------- | ------------------------- |
+| `alian_structure_system_cpu_usage_percent`      | Gauge     | `SystemMetricsService`    |
+| `alian_structure_system_process_cpu_usage_percent` | Gauge  | `SystemMetricsService`    |
+| `alian_structure_system_load_average`           | Gauge     | `SystemMetricsService`    |
+| `alian_structure_system_memory_usage_bytes` / `_percent` | Gauge | `SystemMetricsService` |
+| `alian_structure_system_disk_usage_bytes` / `_percent`   | Gauge | `SystemMetricsService` |
+| `alian_structure_operation_duration_seconds`    | Histogram | `@Monitor` decorator      |
+| `alian_structure_operation_total`               | Counter   | `@Monitor` decorator      |
+| `alian_structure_alerts_active`                 | Gauge     | `AlertRulesService`       |
+| `alian_structure_alerts_fired_total`            | Counter   | `AlertRulesService`       |
+
+### Instrumenting an operation
+
+```ts
+import { Monitor } from "../monitoring";
+
+class PricingService {
+  @Monitor({ name: "pricing.recompute" })
+  async recompute() {
+    /* latency + success/error counts recorded automatically */
+  }
+}
+```
+
+For ad-hoc business metrics, inject `MonitoringMetricsService` and call
+`incrementCounter` / `setGauge` / `observeOperation`.
+
+### Configuration
+
+| Env var                            | Default        | Meaning                              |
+| ---------------------------------- | -------------- | ------------------------------------ |
+| `MONITORING_SYSTEM_INTERVAL_MS`    | `15000`        | System sampling interval             |
+| `MONITORING_DISK_MOUNT`            | `/` (`C:\` win)| Mount reported for disk usage        |
+| `MONITORING_ALERT_INTERVAL_MS`     | `30000`        | Alert-rule evaluation interval       |
+| `MONITORING_HISTORY_INTERVAL_MS`   | `15000`        | Historical capture interval          |
+| `MONITORING_HISTORY_RETENTION_MS`  | `86400000`     | History retention window (24h)       |
+| `MONITORING_HISTORY_MAX_POINTS`    | `5760`         | Hard cap on retained points          |
+
 ## Customisation tips
 
 - **Add metric labels.** Custom labels should be bounded (fixed value
