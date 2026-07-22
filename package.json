@@ -39,6 +39,7 @@
     "openapi:client": "npm run openapi:export && npx @openapitools/openapi-generator-cli generate -i docs/openapi.json -g typescript-fetch -o client --additional-properties=supportsES6=true,typescriptThreePlus=true"
   },
   "dependencies": {
+    "@elastic/elasticsearch": "^9.4.2",
     "@nestjs/axios": "^4.0.1",
     "@nestjs/bull": "^11.0.4",
     "@nestjs/config": "^3.1.1",
@@ -103,7 +104,11 @@
     "swagger-ui-express": "^5.0.1",
     "toidentifier": "^1.0.1",
     "typeorm": "^0.3.19",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "winston": "^3.19.0",
+    "winston-cloudwatch": "^6.3.0",
+    "winston-daily-rotate-file": "^5.0.0",
+    "winston-transport": "^4.9.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.3.2",

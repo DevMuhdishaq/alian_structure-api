@@ -115,6 +115,7 @@ describe("AuthService", () => {
           email: "test@example.com",
           username: "testuser",
           role: UserRole.USER,
+          tier: "free",
           referralCode: "ABC123",
         },
       });
@@ -173,6 +174,7 @@ describe("AuthService", () => {
           email: "test@example.com",
           username: "testuser",
           role: UserRole.USER,
+          tier: "free",
           referralCode: "ABC123",
         },
       });
@@ -256,6 +258,7 @@ describe("AuthService", () => {
           email: "test@example.com",
           username: "testuser",
           role: UserRole.USER,
+          tier: "free",
           referralCode: "ABC123",
         },
       });

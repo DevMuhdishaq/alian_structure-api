@@ -3,10 +3,13 @@ import { WalletAuthService } from "./wallet-auth.service";
 import { ChallengeService } from "./challenge.service";
 import { EnhancedAuthService } from "./enhanced-auth.service";
 import { JwtService } from "@nestjs/jwt";
+import { ConfigService } from "@nestjs/config";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { User, UserRole, KycStatus } from "../user/entities/user.entity";
 import { Wallet, WalletType, WalletStatus } from "./entities/wallet.entity";
 import { Repository } from "typeorm";
+import { EmailService } from "./email.service";
+import { ProvenanceService } from "src/infrastructure/audit/provenance.service";
 import {
   UnauthorizedException,
   BadRequestException,
@@ -114,6 +117,20 @@ describe("WalletAuthService", () => {
     verifyTwoFactorCode: jest.fn().mockResolvedValue(undefined),
   };
 
+  const mockConfigService = {
+    get: jest.fn().mockReturnValue(undefined),
+  };
+
+  const mockEmailService = {
+    sendWalletLinkedNotification: jest.fn().mockResolvedValue(undefined),
+    sendWalletUnlinkedNotification: jest.fn().mockResolvedValue(undefined),
+    sendRecoveryInitiatedEmail: jest.fn().mockResolvedValue(undefined),
+  };
+
+  const mockProvenanceService = {
+    recordWalletEvent: jest.fn().mockResolvedValue(undefined),
+  };
+
   const mockUserRepository = {
     findOne: jest.fn(),
     save: jest.fn(),
@@ -163,6 +180,18 @@ describe("WalletAuthService", () => {
         {
           provide: getRepositoryToken(Wallet),
           useValue: mockWalletRepository,
+        },
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
+        },
+        {
+          provide: EmailService,
+          useValue: mockEmailService,
+        },
+        {
+          provide: ProvenanceService,
+          useValue: mockProvenanceService,
         },
       ],
     }).compile();

@@ -45,6 +45,8 @@ import { HealthModule } from "./health/health.module";
 import { ObservabilityModule } from "./observability/observability.module";
 // Modules – profiling
 import { ProfilingModule } from "./profiling/profiling.module";
+// Modules – logging
+import { LoggerModule } from "./logging/logger.module";
 
 // Auth entities
 import { User } from "./core/user/entities/user.entity";
@@ -200,6 +202,18 @@ import { ProfilingMiddleware } from "./profiling/profiling.middleware";
     ObservabilityModule,
     ProfilingModule,
     AgentReviewsModule,
+    LoggerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (cfg: ConfigService) => ({
+        serviceName: cfg.get<string>("SERVICE_NAME") ?? "alian-structure-api",
+        level: (cfg.get<string>("LOG_LEVEL") ?? "info") as any,
+        logFileDir: cfg.get<string>("LOG_FILE_DIR"),
+        enableCloudWatch: true,
+        enableElk: true,
+        enablePerformanceInterceptor: true,
+        performanceConfig: { thresholdMs: 1000 },
+      }),
+    }),
   ],
 
   controllers: [AppController],

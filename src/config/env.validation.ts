@@ -74,6 +74,68 @@ export class EnvironmentVariables {
   @IsString()
   LOG_LEVEL: string = "info";
 
+  /** Human-readable service name injected into every structured log record. */
+  @IsOptional()
+  @IsString()
+  SERVICE_NAME?: string = "alian-structure-api";
+
+  /** Directory for daily-rotating log files. Omit to disable file logging. */
+  @IsOptional()
+  @IsString()
+  LOG_FILE_DIR?: string;
+
+  // CloudWatch logging configuration (all optional)
+  @IsOptional()
+  @IsString()
+  CLOUDWATCH_GROUP_NAME?: string;
+
+  @IsOptional()
+  @IsString()
+  CLOUDWATCH_STREAM_NAME?: string;
+
+  @IsOptional()
+  @IsString()
+  CLOUDWATCH_LOG_LEVEL?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Transform(({ value }) => parseInt(value, 10) || 2000)
+  CLOUDWATCH_UPLOAD_RATE_MS?: number = 2000;
+
+  @IsOptional()
+  @IsNumber()
+  @Transform(({ value }) => parseInt(value, 10) || 30)
+  CLOUDWATCH_RETENTION_DAYS?: number = 30;
+
+  // Elasticsearch / ELK logging configuration (all optional)
+  @IsOptional()
+  @IsString()
+  ELASTICSEARCH_URL?: string;
+
+  @IsOptional()
+  @IsString()
+  ELASTICSEARCH_INDEX_PREFIX?: string;
+
+  @IsOptional()
+  @IsString()
+  ELASTICSEARCH_USERNAME?: string;
+
+  @IsOptional()
+  @IsString()
+  ELASTICSEARCH_PASSWORD?: string;
+
+  @IsOptional()
+  @IsString()
+  ELASTICSEARCH_API_KEY?: string;
+
+  @IsOptional()
+  @IsString()
+  ELASTICSEARCH_CA_CERT?: string;
+
+  @IsOptional()
+  @IsString()
+  ELASTICSEARCH_LOG_LEVEL?: string;
+
   @IsOptional()
   @IsString()
   SENTRY_DSN?: string;
