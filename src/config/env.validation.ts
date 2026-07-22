@@ -182,6 +182,43 @@ export class EnvironmentVariables {
   @IsString()
   METRICS_AUTH_TOKEN?: string;
 
+  // Monitoring & metrics module configuration (all optional; sane defaults
+  // applied in the respective services).
+  /** Interval between system CPU/memory/disk samples, in ms. Default 15000. */
+  @IsOptional()
+  @IsNumber()
+  @Transform(({ value }) => parseInt(value, 10) || 15000)
+  MONITORING_SYSTEM_INTERVAL_MS?: number;
+
+  /** Mount point / drive to report disk usage for. Default "/" ("C:\\" on Windows). */
+  @IsOptional()
+  @IsString()
+  MONITORING_DISK_MOUNT?: string;
+
+  /** Interval between alert-rule evaluations, in ms. Default 30000. */
+  @IsOptional()
+  @IsNumber()
+  @Transform(({ value }) => parseInt(value, 10) || 30000)
+  MONITORING_ALERT_INTERVAL_MS?: number;
+
+  /** Interval between historical metric captures, in ms. Default 15000. */
+  @IsOptional()
+  @IsNumber()
+  @Transform(({ value }) => parseInt(value, 10) || 15000)
+  MONITORING_HISTORY_INTERVAL_MS?: number;
+
+  /** Historical metrics retention window, in ms. Default 86400000 (24h). */
+  @IsOptional()
+  @IsNumber()
+  @Transform(({ value }) => parseInt(value, 10) || 86400000)
+  MONITORING_HISTORY_RETENTION_MS?: number;
+
+  /** Max retained historical points (hard memory cap). Default 5760. */
+  @IsOptional()
+  @IsNumber()
+  @Transform(({ value }) => parseInt(value, 10) || 5760)
+  MONITORING_HISTORY_MAX_POINTS?: number;
+
   // Blockchain configuration
   @IsNumber()
   @Transform(({ value }) => parseInt(value, 10) || 1)

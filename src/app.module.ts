@@ -43,6 +43,8 @@ import { DashboardModule } from "./dashboard/dashboard.module";
 import { HealthModule } from "./health/health.module";
 // Modules – observability
 import { ObservabilityModule } from "./observability/observability.module";
+// Modules – monitoring
+import { MonitoringModule } from "./monitoring/monitoring.module";
 // Modules – profiling
 import { ProfilingModule } from "./profiling/profiling.module";
 // Modules – logging
@@ -200,6 +202,7 @@ import { ProfilingMiddleware } from "./profiling/profiling.middleware";
     AlertsModule,
     HealthModule,
     ObservabilityModule,
+    MonitoringModule,
     ProfilingModule,
     AgentReviewsModule,
     LoggerModule.forRootAsync({
