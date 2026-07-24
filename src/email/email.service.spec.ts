@@ -9,13 +9,13 @@ import { EmailLog, EmailStatus, EmailProvider } from "./entities/email-log.entit
 import { SendEmailDto } from "./dto/send-email.dto";
 
 const mockEmailLogRepository = () => ({ create: jest.fn(), save: jest.fn(), findOne: jest.fn(), update: jest.fn() });
-const mockEmailQueueService = () => ({ enqueueEmail: jest.fn(), processEmail: jest.fn(), getFailedEmailLogs: jest.fn() });
+const mockEmailQueueService = () => ({ enqueueEmail: jest.fn(), processEmail: jest.fn(), getPendingEmailCount: jest.fn(), getFailedEmailLogs: jest.fn() });
 const mockConfigService = () => ({ get: jest.fn((key: string, fb?: any) => ({ EMAIL_PROVIDER: "smtp", EMAIL_FROM: "test@alian-structure.com" }[key] || fb)) });
 
 describe("EmailService", () => {
   let service: EmailService;
   let emailLogRepo: jest.Mocked<Repository<EmailLog>>;
-  let queueService: EmailQueueService;
+  let queueService: EmailQueueService & { enqueueEmail: jest.Mock; processEmail: jest.Mock; getPendingEmailCount: jest.Mock; getFailedEmailLogs: jest.Mock };
   let templateEngine: TemplateEngineService;
 
   beforeEach(async () => {
@@ -27,7 +27,7 @@ describe("EmailService", () => {
     }).compile();
     service = module.get<EmailService>(EmailService);
     emailLogRepo = module.get(getRepositoryToken(EmailLog));
-    queueService = module.get<EmailQueueService>(EmailQueueService);
+    queueService = module.get(EmailQueueService) as any;
     templateEngine = module.get<TemplateEngineService>(TemplateEngineService);
   });
 

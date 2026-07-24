@@ -23,7 +23,11 @@ export class EmailQueueService {
     private readonly sendgridProvider: SendgridEmailProvider,
     private readonly sesProvider: SesEmailProvider,
   ) {
-    this.providers = new Map([[EmailProvider.SMTP, this.smtpProvider], [EmailProvider.SENDGRID, this.sendgridProvider], [EmailProvider.SES, this.sesProvider]]);
+    this.providers = new Map<EmailProvider, IEmailProvider>([
+      [EmailProvider.SMTP, this.smtpProvider],
+      [EmailProvider.SENDGRID, this.sendgridProvider],
+      [EmailProvider.SES, this.sesProvider],
+    ]);
   }
 
   async enqueueEmail(emailLogId: string): Promise<Job<EmailJobData>> {
@@ -46,11 +50,23 @@ export class EmailQueueService {
     const options: SendEmailOptions = { to: emailLog.recipientEmail, from: emailLog.senderEmail, subject: emailLog.subject, html: emailLog.metadata?.html || "", text: emailLog.metadata?.text || "", attachments: emailLog.metadata?.attachments };
     try {
       const result = await provider.sendEmail(options);
-      await this.emailLogRepository.update(emailLogId, { status: EmailStatus.SENT, providerMessageId: result.messageId, attempts: emailLog.attempts + 1, lastAttemptAt: new Date(), metadata: { ...emailLog.metadata, provider: result.provider, sentAt: new Date().toISOString() } });
+      const updatedMetadata: Record<string, any> = { ...(emailLog.metadata || {}), provider: result.provider, sentAt: new Date().toISOString() };
+      await this.emailLogRepository.update(emailLogId, {
+        status: EmailStatus.SENT,
+        providerMessageId: result.messageId,
+        attempts: emailLog.attempts + 1,
+        lastAttemptAt: new Date(),
+        metadata: updatedMetadata,
+      });
       this.logger.log(`Email ${emailLogId} sent via ${result.provider}`);
     } catch (err: any) {
       const attempts = emailLog.attempts + 1;
-      await this.emailLogRepository.update(emailLogId, { attempts, lastAttemptAt: new Date(), errorMessage: err.message, status: attempts >= emailLog.maxAttempts ? EmailStatus.FAILED : EmailStatus.QUEUED });
+      await this.emailLogRepository.update(emailLogId, {
+        attempts,
+        lastAttemptAt: new Date(),
+        errorMessage: err.message,
+        status: attempts >= emailLog.maxAttempts ? EmailStatus.FAILED : EmailStatus.QUEUED,
+      });
       this.logger.error(`Email ${emailLogId} attempt ${attempts}/${emailLog.maxAttempts} failed: ${err.message}`);
       throw err;
     }
