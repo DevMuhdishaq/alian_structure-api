@@ -47,6 +47,8 @@ import { ObservabilityModule } from "./observability/observability.module";
 import { MonitoringModule } from "./monitoring/monitoring.module";
 // Modules – profiling
 import { ProfilingModule } from "./profiling/profiling.module";
+// Modules - email
+import { EmailModule } from "./email/email.module";
 // Modules – logging
 import { LoggerModule } from "./logging/logger.module";
 
@@ -75,6 +77,8 @@ import { OptimizationHistory } from "./investment/portfolio/entities/optimizatio
 import { RebalancingEvent } from "./investment/portfolio/entities/rebalancing-event.entity";
 import { PerformanceMetric } from "./investment/portfolio/entities/performance-metric.entity";
 import { BacktestResult } from "./investment/portfolio/entities/backtest-result.entity";
+// Email entity
+import { EmailLog } from "./email/entities/email-log.entity";
 
 // DeFi entities
 import { DeFiPosition } from "./defi/entities/defi-position.entity";
@@ -174,6 +178,7 @@ import { ProfilingMiddleware } from "./profiling/profiling.middleware";
             Alert,
             AlertTriggerLog,
             AlertPreference,
+            EmailLog,
             AgentReview,
           ],
           synchronize: true,
@@ -204,6 +209,7 @@ import { ProfilingMiddleware } from "./profiling/profiling.middleware";
     ObservabilityModule,
     MonitoringModule,
     ProfilingModule,
+    EmailModule,
     AgentReviewsModule,
     LoggerModule.forRootAsync({
       inject: [ConfigService],
