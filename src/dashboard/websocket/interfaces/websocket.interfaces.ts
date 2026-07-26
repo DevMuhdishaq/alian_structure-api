@@ -27,6 +27,9 @@ export enum DashboardEvent {
   REPLAY_EVENTS = "events:replay",
   EVENTS_REPLAYED = "events:replayed",
 
+  // Alert events
+  ALERT_TRIGGERED = "alert:triggered",
+
   // Error events
   ERROR = "error",
 }

@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { EventEmitterModule } from "@nestjs/event-emitter";
 import { Alert } from "./entities/alert.entity";
@@ -10,11 +10,16 @@ import { AlertDispatcherService } from "./services/alert-dispatcher.service";
 import { AlertEvaluationService } from "./services/alert-evaluation.service";
 import { RiskAlertListener } from "./listeners/risk-alert.listener";
 import { PortfolioAlertListener } from "./listeners/portfolio-alert.listener";
+import { PushNotificationService } from "./services/push-notification.service";
+import { EmailModule } from "../../email/email.module";
+import { DashboardModule } from "../../dashboard/dashboard.module";
 
 @Module({
   imports: [
     EventEmitterModule.forRoot(),
     TypeOrmModule.forFeature([Alert, AlertTriggerLog, AlertPreference]),
+    forwardRef(() => EmailModule),
+    forwardRef(() => DashboardModule),
   ],
   providers: [
     AlertsService,
@@ -22,8 +27,9 @@ import { PortfolioAlertListener } from "./listeners/portfolio-alert.listener";
     AlertEvaluationService,
     RiskAlertListener,
     PortfolioAlertListener,
+    PushNotificationService,
   ],
   controllers: [AlertsController],
-  exports: [AlertsService, AlertDispatcherService, AlertEvaluationService],
+  exports: [AlertsService, AlertDispatcherService, AlertEvaluationService, PushNotificationService],
 })
 export class AlertsModule {}
