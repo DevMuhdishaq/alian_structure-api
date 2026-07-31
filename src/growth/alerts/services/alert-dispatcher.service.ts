@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, Inject, Optional } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import {
@@ -6,6 +6,10 @@ import {
   AlertFrequency,
 } from "../entities/alert-preference.entity";
 import { AlertTriggerLog } from "../entities/alert-trigger-log.entity";
+import { EmailService } from "../../../email/email.service";
+import { DashboardGateway } from "../../../dashboard/websocket/dashboard.gateway";
+import { DashboardEvent } from "../../../dashboard/websocket/interfaces/websocket.interfaces";
+import { PushNotificationService } from "./push-notification.service";
 
 interface RateLimitEntry {
   count: number;
@@ -30,6 +34,15 @@ export class AlertDispatcherService {
     private readonly preferenceRepo: Repository<AlertPreference>,
     @InjectRepository(AlertTriggerLog)
     private readonly logRepo: Repository<AlertTriggerLog>,
+    @Optional()
+    @Inject(EmailService)
+    private readonly emailService?: EmailService,
+    @Optional()
+    @Inject(DashboardGateway)
+    private readonly dashboardGateway?: DashboardGateway,
+    @Optional()
+    @Inject(PushNotificationService)
+    private readonly pushService?: PushNotificationService,
   ) {}
 
   async dispatch(userId: string, payload: object): Promise<void> {
@@ -174,27 +187,53 @@ export class AlertDispatcherService {
   ): Promise<void> {
     try {
       if (channel === "in-app") {
-        this.logger.log(
-          `[In-App] Delivering alert to user ${userId}: ${JSON.stringify(payload)}`,
-        );
         const log = this.logRepo.create({
           alertId: "dispatcher",
           userId,
           payload: { ...payload, channel: "in-app" } as Record<string, unknown>,
         });
         await this.logRepo.save(log);
+        this.logger.log(`[In-App] Delivered alert to user ${userId}`);
       } else if (channel === "email") {
-        this.logger.log(
-          `[Email] Would send to user ${userId}: ${JSON.stringify(payload)}`,
-        );
+        if (this.emailService) {
+          const p = payload as Record<string, unknown>;
+          const alertType = (p.type as string) || "alert";
+          const message = (p.message as string) || "";
+          const html = this.buildEmailHtml(alertType, message);
+          await this.emailService.sendEmail({
+            to: [userId],
+            subject: `[Alian] Alert: ${alertType}`,
+            html,
+            text: message || JSON.stringify(payload),
+          } as any);
+          this.logger.log(`[Email] Queued alert email for user ${userId}`);
+        } else {
+          this.logger.warn(`[Email] EmailService unavailable for user ${userId}`);
+        }
       } else if (channel === "websocket") {
-        this.logger.log(
-          `[WebSocket] Would push to user ${userId}: ${JSON.stringify(payload)}`,
-        );
+        if (this.dashboardGateway) {
+          this.dashboardGateway.broadcastToUser(
+            userId,
+            DashboardEvent.ALERT_TRIGGERED,
+            payload,
+          );
+          this.logger.log(`[WebSocket] Pushed alert to user ${userId}`);
+        } else {
+          this.logger.warn(`[WebSocket] DashboardGateway unavailable for user ${userId}`);
+        }
       } else if (channel === "push") {
-        this.logger.log(
-          `[Push] Would send push notification to user ${userId}: ${JSON.stringify(payload)}`,
-        );
+        if (this.pushService) {
+          const p = payload as Record<string, unknown>;
+          await this.pushService.send({
+            userId,
+            title: `Alert: ${(p.type as string) || "Notification"}`,
+            body: (p.message as string) || JSON.stringify(payload),
+            data: p as Record<string, unknown>,
+          });
+          this.logger.log(`[Push] Sent push notification to user ${userId}`);
+        } else {
+          this.logger.warn(`[Push] PushNotificationService unavailable for user ${userId}`);
+        }
       } else {
         this.logger.warn(`[Dispatcher] Unknown channel: ${channel}`);
       }
@@ -211,6 +250,15 @@ export class AlertDispatcherService {
         `[Dispatcher] Failed to deliver via ${channel} for user ${userId} after 3 attempts: ${(err as Error).message}`,
       );
     }
+  }
+
+  private buildEmailHtml(alertType: string, message: string): string {
+    return `
+      <h2>Alert: ${alertType}</h2>
+      <p>${message || "You have a new notification from Alian Structure."}</p>
+      <hr />
+      <small>Alian Structure API — Notification Service</small>
+    `;
   }
 
   private isInQuietHours(start: number, end: number): boolean {
