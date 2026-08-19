@@ -35,11 +35,13 @@
     "docs:generate": "nest start --watch",
     "docs:serve": "nest start",
     "docs:build": "nest build && node dist/main.js",
+    "graphql:codegen": "graphql-codegen --config codegen.ts && prettier --write --ignore-path /dev/null src/graphql/client/generated.ts",
     "openapi:export": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register scripts/export-openapi.ts",
     "openapi:client": "npm run openapi:export && npx @openapitools/openapi-generator-cli generate -i docs/openapi.json -g typescript-fetch -o client --additional-properties=supportsES6=true,typescriptThreePlus=true"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^9.4.2",
+    "@graphql-typed-document-node/core": "^3.2.0",
     "@nestjs/axios": "^4.0.1",
     "@nestjs/bull": "^11.0.4",
     "@nestjs/config": "^3.1.1",
@@ -77,11 +79,13 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "crypto": "^1.0.1",
+    "dataloader": "^2.2.3",
     "dotenv": "^16.3.1",
     "ethers": "^6.10.0",
     "express": "^5.2.1",
     "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^8.2.1",
+    "graphql": "^16.14.2",
     "helmet": "^8.1.0",
     "hpp": "^0.2.3",
     "ioredis": "^5.9.3",
@@ -111,6 +115,10 @@
     "winston-transport": "^4.9.0"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^7.2.0",
+    "@graphql-codegen/typed-document-node": "^7.1.0",
+    "@graphql-codegen/typescript": "^6.1.0",
+    "@graphql-codegen/typescript-operations": "^6.1.6",
     "@nestjs/cli": "^10.3.2",
     "@nestjs/common": "^10.4.22",
     "@nestjs/jwt": "^11.0.2",
