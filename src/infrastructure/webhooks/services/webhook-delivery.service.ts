@@ -7,16 +7,12 @@ import {
   WebhookDelivery,
   WebhookDeliveryStatus,
 } from "../entities/webhook-delivery.entity";
-import {
-  WebhookDeadLetter,
-} from "../entities/webhook-dead-letter.entity";
+import { WebhookDeadLetter } from "../entities/webhook-dead-letter.entity";
 import {
   WebhookSubscription,
+  WebhookSubscriptionStatus,
 } from "../entities/webhook-subscription.entity";
-import {
-  WebhookEvent,
-  WebhookEventStatus,
-} from "../entities/webhook-event.entity";
+import { WebhookEvent } from "../entities/webhook-event.entity";
 import { WebhookHmacService } from "./webhook-hmac.service";
 
 export interface DeliveryResult {
@@ -34,7 +30,10 @@ export interface WebhookMetrics {
   deadLetteredCount: number;
   pendingRetries: number;
   avgDurationMs: number;
-  deliveriesByEvent: Record<string, { total: number; success: number; failed: number }>;
+  deliveriesByEvent: Record<
+    string,
+    { total: number; success: number; failed: number }
+  >;
 }
 
 @Injectable()
@@ -168,11 +167,15 @@ export class WebhookDeliveryService {
     const subscription = await this.subscriptionRepo.findOne({
       where: { id: delivery.subscriptionId },
     });
-    if (!subscription) throw new Error(`Subscription ${delivery.subscriptionId} not found`);
+    if (!subscription)
+      throw new Error(`Subscription ${delivery.subscriptionId} not found`);
 
     const result = await this.executeDelivery(delivery);
     const attemptNum = delivery.attempts + 1;
-    const isSuccess = result.statusCode !== undefined && result.statusCode >= 200 && result.statusCode < 300;
+    const isSuccess =
+      result.statusCode !== undefined &&
+      result.statusCode >= 200 &&
+      result.statusCode < 300;
 
     // Record attempt in metadata
     const attempts = (delivery.metadata?.attempts as any[]) || [];
@@ -297,7 +300,7 @@ export class WebhookDeliveryService {
   /**
    * Get pending deliveries that are due for retry.
    */
-  async getPendingRetries(): Promise<WebhookDelivery[]> {
+  async getPendingRetries(): Promise<WebhookDeadLetter[]> {
     return this.deadLetterRepo.find({
       where: { retried: false },
       order: { createdAt: "ASC" },
@@ -317,7 +320,10 @@ export class WebhookDeliveryService {
     const subscription = await this.subscriptionRepo.findOne({
       where: { id: dl.subscriptionId },
     });
-    if (!subscription || subscription.status !== WebhookSubscriptionStatus.ACTIVE) {
+    if (
+      !subscription ||
+      subscription.status !== WebhookSubscriptionStatus.ACTIVE
+    ) {
       return null;
     }
 
@@ -333,7 +339,9 @@ export class WebhookDeliveryService {
     dl.retried = true;
     await this.deadLetterRepo.save(dl);
 
-    this.logger.log(`Dead letter ${deadLetterId} requeued as delivery ${saved.id}`);
+    this.logger.log(
+      `Dead letter ${deadLetterId} requeued as delivery ${saved.id}`,
+    );
     return saved;
   }
 
@@ -385,7 +393,9 @@ export class WebhookDeliveryService {
     ).length;
     const pendingRetries = deliveries.filter(
       (d) =>
-        d.status === WebhookDeliveryStatus.FAILED && d.nextRetryAt && d.nextRetryAt > new Date(),
+        d.status === WebhookDeliveryStatus.FAILED &&
+        d.nextRetryAt &&
+        d.nextRetryAt > new Date(),
     ).length;
 
     const durations = deliveries

@@ -40,8 +40,9 @@ export class WebhookEventService {
     this.logger.log(`Event published: ${saved.id} type=${saved.eventType}`);
 
     // Find matching subscribers
-    const subscribers =
-      await this.subscriptionService.findActiveForEvent(dto.eventType);
+    const subscribers = await this.subscriptionService.findActiveForEvent(
+      dto.eventType,
+    );
 
     if (subscribers.length === 0) {
       this.logger.log(

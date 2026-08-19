@@ -23,7 +23,8 @@ export class CreateWebhookSubscriptionDto {
 
   @ApiProperty({
     example: ["portfolio.rebalanced", "alert.triggered"],
-    description: "List of event types to subscribe to. Use '*' to receive all events.",
+    description:
+      "List of event types to subscribe to. Use '*' to receive all events.",
   })
   @IsArray()
   @IsString({ each: true })
@@ -35,7 +36,10 @@ export class CreateWebhookSubscriptionDto {
   @MaxLength(255)
   description?: string;
 
-  @ApiPropertyOptional({ example: 5, description: "Max retry attempts per delivery" })
+  @ApiPropertyOptional({
+    example: 5,
+    description: "Max retry attempts per delivery",
+  })
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -49,21 +53,30 @@ export class CreateWebhookSubscriptionDto {
   @Max(60000)
   retryDelayMs?: number;
 
-  @ApiPropertyOptional({ example: 2, description: "Exponential backoff multiplier" })
+  @ApiPropertyOptional({
+    example: 2,
+    description: "Exponential backoff multiplier",
+  })
   @IsOptional()
   @IsNumber()
   @Min(1)
   @Max(5)
   backoffMultiplier?: number;
 
-  @ApiPropertyOptional({ example: 30000, description: "HTTP request timeout in ms" })
+  @ApiPropertyOptional({
+    example: 30000,
+    description: "HTTP request timeout in ms",
+  })
   @IsOptional()
   @IsNumber()
   @Min(1000)
   @Max(120000)
   timeoutMs?: number;
 
-  @ApiPropertyOptional({ example: 10, description: "Max deliveries per minute" })
+  @ApiPropertyOptional({
+    example: 10,
+    description: "Max deliveries per minute",
+  })
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -153,7 +166,9 @@ export class PublishWebhookEventDto {
   @MaxLength(255)
   eventType: string;
 
-  @ApiProperty({ example: { portfolioId: "abc", oldAllocation: {}, newAllocation: {} } })
+  @ApiProperty({
+    example: { portfolioId: "abc", oldAllocation: {}, newAllocation: {} },
+  })
   @IsObject()
   payload: Record<string, any>;
 

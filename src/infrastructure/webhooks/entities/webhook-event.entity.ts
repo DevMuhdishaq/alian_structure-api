@@ -29,7 +29,11 @@ export class WebhookEvent {
   @Index()
   aggregateId?: string;
 
-  @Column({ type: "enum", enum: WebhookEventStatus, default: WebhookEventStatus.PENDING })
+  @Column({
+    type: "enum",
+    enum: WebhookEventStatus,
+    default: WebhookEventStatus.PENDING,
+  })
   status: WebhookEventStatus;
 
   @Column({ type: "int", default: 0 })

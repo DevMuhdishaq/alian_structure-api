@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-  BadRequestException,
-} from "@nestjs/common";
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { randomBytes } from "crypto";
@@ -63,7 +58,8 @@ export class WebhookSubscriptionService {
     const sub = await this.subscriptionRepo.findOne({
       where: { id, userId },
     });
-    if (!sub) throw new NotFoundException(`Webhook subscription ${id} not found`);
+    if (!sub)
+      throw new NotFoundException(`Webhook subscription ${id} not found`);
     return sub;
   }
 
@@ -73,10 +69,9 @@ export class WebhookSubscriptionService {
       .where("sub.status = :status", {
         status: WebhookSubscriptionStatus.ACTIVE,
       })
-      .andWhere(
-        `(sub.events LIKE '%:event%' OR sub.events LIKE '%*%')`,
-        { event: eventType },
-      )
+      .andWhere(`(sub.events LIKE '%:event%' OR sub.events LIKE '%*%')`, {
+        event: eventType,
+      })
       .getMany();
   }
 

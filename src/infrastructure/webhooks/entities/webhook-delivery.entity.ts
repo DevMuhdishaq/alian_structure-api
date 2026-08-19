@@ -28,7 +28,11 @@ export class WebhookDelivery {
   @Index()
   eventId: string;
 
-  @Column({ type: "enum", enum: WebhookDeliveryStatus, default: WebhookDeliveryStatus.PENDING })
+  @Column({
+    type: "enum",
+    enum: WebhookDeliveryStatus,
+    default: WebhookDeliveryStatus.PENDING,
+  })
   status: WebhookDeliveryStatus;
 
   @Column({ type: "int", default: 0 })

@@ -31,7 +31,11 @@ export class WebhookSubscription {
   @Column({ type: "simple-array" })
   events: string[];
 
-  @Column({ type: "enum", enum: WebhookSubscriptionStatus, default: WebhookSubscriptionStatus.ACTIVE })
+  @Column({
+    type: "enum",
+    enum: WebhookSubscriptionStatus,
+    default: WebhookSubscriptionStatus.ACTIVE,
+  })
   status: WebhookSubscriptionStatus;
 
   @Column({ type: "varchar", length: 255, nullable: true })

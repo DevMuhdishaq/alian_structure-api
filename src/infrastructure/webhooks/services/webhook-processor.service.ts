@@ -17,7 +17,9 @@ export class WebhookProcessor {
   @Process("deliver")
   async handleDelivery(job: Job<WebhookDeliveryJobData>) {
     const { deliveryId } = job.data;
-    this.logger.log(`Processing webhook delivery job ${job.id} for delivery ${deliveryId}`);
+    this.logger.log(
+      `Processing webhook delivery job ${job.id} for delivery ${deliveryId}`,
+    );
 
     try {
       const delivery = await this.deliveryService.processDelivery(deliveryId);
