@@ -1,12 +1,15 @@
 import { print } from "graphql";
 import type { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import {
+  AgentRatingDocument,
   AgentReviewsDocument,
+  type AgentRatingQuery,
+  type AgentRatingQueryVariables,
   type AgentReviewsQuery,
   type AgentReviewsQueryVariables,
 } from "./generated";
 
-async function executeGraphql<TResult, TVariables>(
+export async function executeGraphql<TResult, TVariables>(
   endpoint: string,
   token: string,
   document: TypedDocumentNode<TResult, TVariables>,
@@ -30,6 +33,22 @@ async function executeGraphql<TResult, TVariables>(
   }
 
   return payload.data;
+}
+
+/** Loads the typed approved-review rating summary for one agent. */
+export async function loadAgentRating(
+  endpoint: string,
+  token: string,
+  agentId: string,
+): Promise<AgentRatingQuery["agentRating"]> {
+  const variables: AgentRatingQueryVariables = { agentId };
+  const data = await executeGraphql(
+    endpoint,
+    token,
+    AgentRatingDocument,
+    variables,
+  );
+  return data.agentRating;
 }
 
 /**

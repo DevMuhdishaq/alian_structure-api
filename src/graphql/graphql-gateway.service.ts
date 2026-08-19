@@ -21,17 +21,25 @@ export interface GraphqlRequest {
   operationName?: string;
 }
 
-const sourceSchemaPath = join(process.cwd(), "src/graphql/schema.graphql");
-const compiledSchemaPath = join(process.cwd(), "dist/graphql/schema.graphql");
+const schemaPaths = [
+  join(__dirname, "schema.graphql"),
+  join(process.cwd(), "src/graphql/schema.graphql"),
+  join(process.cwd(), "dist/graphql/schema.graphql"),
+];
+
+function findSchemaPath(): string {
+  const schemaPath = schemaPaths.find((candidate) => existsSync(candidate));
+  if (!schemaPath) {
+    throw new Error(
+      `GraphQL schema not found. Checked: ${schemaPaths.join(", ")}`,
+    );
+  }
+  return schemaPath;
+}
 
 @Injectable()
 export class GraphqlGatewayService {
-  private readonly schema = buildSchema(
-    readFileSync(
-      existsSync(sourceSchemaPath) ? sourceSchemaPath : compiledSchemaPath,
-      "utf8",
-    ),
-  );
+  private readonly schema = buildSchema(readFileSync(findSchemaPath(), "utf8"));
 
   constructor(
     private readonly reviewsService: AgentReviewsService,

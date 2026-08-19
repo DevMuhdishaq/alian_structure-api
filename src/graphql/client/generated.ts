@@ -119,6 +119,22 @@ export type AgentReviewsQuery = {
   };
 };
 
+export type AgentRatingQueryVariables = Exact<{
+  agentId: string | number;
+}>;
+
+export type AgentRatingQuery = {
+  readonly agentRating: {
+    readonly agentId: string;
+    readonly averageRating: number;
+    readonly totalReviews: number;
+    readonly ratingDistribution: ReadonlyArray<{
+      readonly rating: number;
+      readonly count: number;
+    }>;
+  };
+};
+
 export const AgentReviewsDocument = {
   kind: "Document",
   definitions: [
@@ -273,3 +289,73 @@ export const AgentReviewsDocument = {
     },
   ],
 } as unknown as DocumentNode<AgentReviewsQuery, AgentReviewsQueryVariables>;
+export const AgentRatingDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "AgentRating" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "agentId" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "agentRating" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "agentId" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "agentId" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "agentId" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "averageRating" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "totalReviews" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "ratingDistribution" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "rating" },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "count" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<AgentRatingQuery, AgentRatingQueryVariables>;

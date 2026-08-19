@@ -10,13 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-      
+          node-version: "20"
+          cache: "npm"
+
       - name: Install dependencies
         run: npm ci
 
@@ -24,10 +24,17 @@ jobs:
         run: |
           npm run graphql:codegen
           git diff --exit-code -- src/graphql/client/generated.ts
-      
+
       - name: Run TypeScript check
         run: npx tsc --noEmit
-      
+
+      - name: Test GraphQL gateway and cursor pagination
+        run: >-
+          npm test -- --runInBand
+          src/graphql
+          src/discovery/reviews/agent-reviews.service.spec.ts
+          src/common/pagination/cursor-pagination.service.spec.ts
+
       - name: Build project
         run: npm run build
 
@@ -50,8 +57,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -63,7 +70,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
 
       - name: Generate TypeScript fetch client
         run: |

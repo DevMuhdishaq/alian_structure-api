@@ -105,16 +105,19 @@ npm run graphql:codegen
 ```
 
 The checked-in output is
-[generated.ts](../src/graphql/client/generated.ts). CI regenerates it and
-fails if the committed SDK types are stale.
+[generated.ts](../src/graphql/client/generated.ts). Frontends can import the
+generated documents, operation types, and example helpers through the
+[client entry point](../src/graphql/client/index.ts). CI regenerates the types,
+fails if the committed SDK is stale, and runs the gateway and pagination tests.
 
 ## Typed client example
 
-[example.ts](../src/graphql/client/example.ts) uses the generated
-`AgentReviewsDocument`, `AgentReviewsQuery`, and
-`AgentReviewsQueryVariables` with the platform `fetch` API. It demonstrates
+[example.ts](../src/graphql/client/example.ts) uses the generated documents and
+operation types with the platform `fetch` API. `loadAgentReviews` demonstrates
 safe field access, reading `endCursor`, checking `hasNextPage`, and loading the
-next page without adding a frontend framework or GraphQL client dependency.
+next page. `loadAgentRating` returns a fully typed rating summary, while the
+exported `executeGraphql` helper supports additional generated operations
+without adding a frontend framework or GraphQL client dependency.
 
 ## Development and testing
 
@@ -126,6 +129,7 @@ npm test
 npm run build
 ```
 
-GraphQL unit and execution tests cover cursor validation, stable ordering,
-first/next/final/empty pages, argument limits, query execution, author batching,
-and request cache isolation.
+GraphQL unit, execution, and HTTP contract tests cover cursor validation,
+stable ordering, first/next/final/empty pages, argument limits, query execution,
+author batching, request cache isolation, authentication, and the documented
+`/api/v1/graphql` route.

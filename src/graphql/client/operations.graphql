@@ -19,3 +19,15 @@ query AgentReviews($agentId: ID!, $first: Int!, $after: String) {
     }
   }
 }
+
+query AgentRating($agentId: ID!) {
+  agentRating(agentId: $agentId) {
+    agentId
+    averageRating
+    totalReviews
+    ratingDistribution {
+      rating
+      count
+    }
+  }
+}
