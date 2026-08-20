@@ -53,6 +53,7 @@ import { EmailModule } from "./email/email.module";
 import { LoggerModule } from "./logging/logger.module";
 // Modules – cache
 import { CacheModule } from "./common/cache/cache.module";
+import { BillingModule } from "./billing/billing.module";
 
 // Auth entities
 import { User } from "./core/user/entities/user.entity";
@@ -116,6 +117,7 @@ import { GlobalExceptionFilter } from "./common/filters/global-exception.filter"
 import { SubmissionVerifierService } from "./blockchain/oracle/submission-verifier.service";
 import { LoggingMiddleware } from "./common/middleware/logging.middleware";
 import { ProfilingMiddleware } from "./profiling/profiling.middleware";
+import { GraphqlGatewayModule } from "./graphql/graphql.module";
 
 @Module({
   imports: [
@@ -225,6 +227,7 @@ import { ProfilingMiddleware } from "./profiling/profiling.middleware";
     ProfilingModule,
     EmailModule,
     AgentReviewsModule,
+    GraphqlGatewayModule,
     WebhookModule,
     CacheModule,
     LoggerModule.forRootAsync({
@@ -239,6 +242,7 @@ import { ProfilingMiddleware } from "./profiling/profiling.middleware";
         performanceConfig: { thresholdMs: 1000 },
       }),
     }),
+    BillingModule,
   ],
 
   controllers: [AppController],
