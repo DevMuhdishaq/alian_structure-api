@@ -51,6 +51,8 @@ import { ProfilingModule } from "./profiling/profiling.module";
 import { EmailModule } from "./email/email.module";
 // Modules – logging
 import { LoggerModule } from "./logging/logger.module";
+// Modules – cache
+import { CacheModule } from "./common/cache/cache.module";
 
 // Auth entities
 import { User } from "./core/user/entities/user.entity";
@@ -224,6 +226,7 @@ import { ProfilingMiddleware } from "./profiling/profiling.middleware";
     EmailModule,
     AgentReviewsModule,
     WebhookModule,
+    CacheModule,
     LoggerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (cfg: ConfigService) => ({

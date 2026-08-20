@@ -300,6 +300,17 @@ export class EnvironmentVariables {
   @IsString()
   REDIS_URL?: string;
 
+  /** Cache version prefix (e.g. "v1", "v2"). Default: "v1". */
+  @IsOptional()
+  @IsString()
+  CACHE_VERSION?: string = "v1";
+
+  /** Default TTL in seconds for cached entries. Default: 300. */
+  @IsOptional()
+  @IsNumber()
+  @Transform(({ value }) => parseInt(value, 10) || 300)
+  CACHE_DEFAULT_TTL_SECONDS?: number = 300;
+
   // Health check timeouts
   @IsOptional()
   @IsNumber()
