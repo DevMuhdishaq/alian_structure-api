@@ -178,6 +178,14 @@ See [SECURITY.md](SECURITY.md) for vulnerability reporting details.
 
 ## API Endpoints
 
+### GraphQL Gateway
+
+The authenticated GraphQL endpoint is `POST /api/v1/graphql`. It provides
+typed, cursor-paginated approved agent reviews and rating summaries without
+replacing the existing REST endpoints. See
+[GraphQL Gateway](docs/GRAPHQL_GATEWAY.md) for the schema, pagination contract,
+type generation, and typed client example.
+
 ### Authentication
 
 The backend supports two authentication methods:

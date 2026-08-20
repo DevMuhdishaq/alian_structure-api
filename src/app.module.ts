@@ -114,6 +114,7 @@ import { GlobalExceptionFilter } from "./common/filters/global-exception.filter"
 import { SubmissionVerifierService } from "./blockchain/oracle/submission-verifier.service";
 import { LoggingMiddleware } from "./common/middleware/logging.middleware";
 import { ProfilingMiddleware } from "./profiling/profiling.middleware";
+import { GraphqlGatewayModule } from "./graphql/graphql.module";
 
 @Module({
   imports: [
@@ -223,6 +224,7 @@ import { ProfilingMiddleware } from "./profiling/profiling.middleware";
     ProfilingModule,
     EmailModule,
     AgentReviewsModule,
+    GraphqlGatewayModule,
     WebhookModule,
     LoggerModule.forRootAsync({
       inject: [ConfigService],
