@@ -103,8 +103,14 @@ import { WebhookSubscription } from "./infrastructure/webhooks/entities/webhook-
 import { WebhookEvent } from "./infrastructure/webhooks/entities/webhook-event.entity";
 import { WebhookDelivery } from "./infrastructure/webhooks/entities/webhook-delivery.entity";
 import { WebhookDeadLetter } from "./infrastructure/webhooks/entities/webhook-dead-letter.entity";
+// File upload entities
+import { UploadedFile } from "./infrastructure/file-upload/entities/uploaded-file.entity";
+import { FileThumbnail } from "./infrastructure/file-upload/entities/file-thumbnail.entity";
+import { FileScanResult } from "./infrastructure/file-upload/entities/file-scan-result.entity";
 // Modules – webhooks
 import { WebhookModule } from "./infrastructure/webhooks/webhook.module";
+// Modules – file upload
+import { FileUploadModule } from "./infrastructure/file-upload/file-upload.module";
 
 // Guards
 import { APP_FILTER } from "@nestjs/core";
@@ -194,6 +200,9 @@ import { ProfilingMiddleware } from "./profiling/profiling.middleware";
             WebhookEvent,
             WebhookDelivery,
             WebhookDeadLetter,
+          UploadedFile,
+          FileThumbnail,
+          FileScanResult,
           ],
           synchronize: true,
           logging: true,
@@ -226,6 +235,7 @@ import { ProfilingMiddleware } from "./profiling/profiling.middleware";
     EmailModule,
     AgentReviewsModule,
     WebhookModule,
+    FileUploadModule,
     CacheModule,
     LoggerModule.forRootAsync({
       inject: [ConfigService],
