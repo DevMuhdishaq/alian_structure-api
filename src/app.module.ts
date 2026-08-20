@@ -51,6 +51,7 @@ import { ProfilingModule } from "./profiling/profiling.module";
 import { EmailModule } from "./email/email.module";
 // Modules – logging
 import { LoggerModule } from "./logging/logger.module";
+import { BillingModule } from "./billing/billing.module";
 
 // Auth entities
 import { User } from "./core/user/entities/user.entity";
@@ -238,6 +239,7 @@ import { GraphqlGatewayModule } from "./graphql/graphql.module";
         performanceConfig: { thresholdMs: 1000 },
       }),
     }),
+    BillingModule,
   ],
 
   controllers: [AppController],
