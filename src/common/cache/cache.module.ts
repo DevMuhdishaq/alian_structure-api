@@ -1,4 +1,4 @@
-import { Module, Global, OnModuleDestroy, Optional } from "@nestjs/common";
+import { Inject, Module, Global, OnModuleDestroy, Optional } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import Redis from "ioredis";
 import { CacheService } from "./cache.service";
