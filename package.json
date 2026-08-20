@@ -39,6 +39,9 @@
     "openapi:client": "npm run openapi:export && npx @openapitools/openapi-generator-cli generate -i docs/openapi.json -g typescript-fetch -o client --additional-properties=supportsES6=true,typescriptThreePlus=true"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1115.0",
+    "@aws-sdk/s3-request-presigner": "^3.1115.0",
+    "@azure/storage-blob": "^12.33.0",
     "@elastic/elasticsearch": "^9.4.2",
     "@nestjs/axios": "^4.0.1",
     "@nestjs/bull": "^11.0.4",
@@ -99,6 +102,7 @@
     "rimraf": "^5.0.5",
     "rxjs": "^7.8.1",
     "serve-favicon": "^2.5.1",
+    "sharp": "^0.35.3",
     "socket.io": "^4.8.3",
     "speakeasy": "^2.0.0",
     "swagger-ui-express": "^5.0.1",
