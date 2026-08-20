@@ -51,6 +51,8 @@ import { ProfilingModule } from "./profiling/profiling.module";
 import { EmailModule } from "./email/email.module";
 // Modules – logging
 import { LoggerModule } from "./logging/logger.module";
+// Modules – cache
+import { CacheModule } from "./common/cache/cache.module";
 import { BillingModule } from "./billing/billing.module";
 
 // Auth entities
@@ -227,6 +229,7 @@ import { GraphqlGatewayModule } from "./graphql/graphql.module";
     AgentReviewsModule,
     GraphqlGatewayModule,
     WebhookModule,
+    CacheModule,
     LoggerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (cfg: ConfigService) => ({
