@@ -53,6 +53,8 @@ import { LoggerModule } from "./logging/logger.module";
 // Modules – cache
 import { CacheModule } from "./common/cache/cache.module";
 import { BillingModule } from "./billing/billing.module";
+// Modules – payments (plugin system)
+import { PaymentsModule } from "./payments/payments.module";
 import { RateLimitingModule } from "./rate-limiting/rate-limiting.module";
 import { ReconciliationModule } from "./reconciliation/reconciliation.module";
 
@@ -268,6 +270,7 @@ import { TenantModuleState } from "./modules/registry/entities/tenant-module-sta
       }),
     }),
     BillingModule,
+    PaymentsModule,
     ReconciliationModule,
   ],
 

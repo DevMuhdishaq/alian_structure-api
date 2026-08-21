@@ -538,6 +538,37 @@ export class EnvironmentVariables {
   @IsString()
   REDIS_PASSWORD?: string;
 
+  // ── Payment Processors (plugin system) ─────────────────────────────
+
+  /** Default processor when no `X-Payment-Processor` header is supplied, e.g. "stellar". */
+  @IsOptional()
+  @IsString()
+  PAYMENTS_DEFAULT_PROCESSOR?: string;
+
+  /** Stellar Horizon endpoint. Default: https://horizon-testnet.stellar.org */
+  @IsOptional()
+  @IsString()
+  STELLAR_HORIZON_URL?: string;
+
+  /** Stellar network passphrase. Default: testnet passphrase. */
+  @IsOptional()
+  @IsString()
+  STELLAR_NETWORK_PASSPHRASE?: string;
+
+  /** Secret seed the server signs Stellar transactions/refunds with. */
+  @IsOptional()
+  @IsString()
+  STELLAR_SIGNING_SECRET?: string;
+
+  /** Base URL of the Grantfox REST gateway. */
+  @IsOptional()
+  @IsString()
+  GRANTFOX_API_URL?: string;
+
+  /** Bearer API key for the Grantfox gateway. */
+  @IsOptional()
+  @IsString()
+  GRANTFOX_API_KEY?: string;
   // Rate Limiting & Abuse Protection (distributed, Redis-backed)
 
   /** Redis key prefix for rate-limit entries. Default: "alian:rl:". */
