@@ -121,6 +121,28 @@ or `?processor=`.
 | `POST` | `/payments/processors/:name/enable` | **ADMIN** | — |
 | `POST` | `/payments/processors/:name/disable` | **ADMIN** | — |
 
+### Stellar convenience routes
+
+The feature spec names Stellar-specific endpoints. These three aliases pin the
+processor to Stellar — no `X-Payment-Processor` header needed, and
+`PAYMENTS_DEFAULT_PROCESSOR` is ignored:
+
+| Method | Path | Body | Maps to |
+|---|---|---|---|
+| `POST` | `/payments/stellar/create` | `CreatePaymentDto` | create, forced to Stellar |
+| `POST` | `/payments/stellar/submit` | `StellarSubmitDto` | server-side sign **+** submit (or submit a client-signed payload) |
+| `GET`  | `/payments/stellar/status?id=<hash>` | — | status by on-chain transaction hash |
+
+Because Stellar signs server-side, `submit` takes the created payment's
+`unsignedTransaction`, signs it, and submits — so the create → submit flow needs
+no separate sign step. Pass `signedPayload` instead to submit a client-signed
+XDR as-is. `paymentId` travels in the body (there is no `:id` in the path).
+
+> These are thin aliases over the generic endpoints, declared in a dedicated
+> controller registered **before** the generic one so the static
+> `/payments/stellar/{submit,status}` paths take precedence over the dynamic
+> `/payments/:id/{submit,status}` routes (Express matches in registration order).
+
 ### Example
 
 ```bash
@@ -208,5 +230,8 @@ npm run test -- src/payments        # unit + integration, fully offline
   mocked Horizon `Server` / `HttpService`.
 - `payments.integration.spec` — **side-by-side**: routing by header/env, two
   processors isolated in one test, and disabling one leaving the other working.
+- `stellar-payments.controller.spec` — the `/payments/stellar/*` aliases: pinning
+  to Stellar under a `grantfox` env default, server-side sign+submit, and the
+  route-precedence guarantee over the generic `/payments/:id/*` routes.
 
 Network clients are always mocked/injected, so no test touches the network.
