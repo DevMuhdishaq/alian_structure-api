@@ -4,6 +4,6 @@
     "rootDir": "..",
     "noEmit": true
   },
-  "include": ["./modules/**/*.ts"],
+  "include": ["./modules/**/*.ts", "./alerts/alert-preferences.e2e-spec.ts"],
   "exclude": ["../node_modules", "../dist"]
 }

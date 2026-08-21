@@ -1,19 +1,19 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication, ValidationPipe } from "@nestjs/common";
-import * as request from "supertest";
+import request from "supertest";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { EventEmitterModule } from "@nestjs/event-emitter";
 import {
   Alert,
   AlertType,
   AlertCondition,
-} from "../../src/growth/alerts/entities/alert.entity";
-import { AlertTriggerLog } from "../../src/growth/alerts/entities/alert-trigger-log.entity";
+} from "src/growth/alerts/entities/alert.entity";
+import { AlertTriggerLog } from "src/growth/alerts/entities/alert-trigger-log.entity";
 import {
   AlertPreference,
   AlertFrequency,
-} from "../../src/growth/alerts/entities/alert-preference.entity";
-import { AlertsModule } from "../../src/growth/alerts/alerts.module";
+} from "src/growth/alerts/entities/alert-preference.entity";
+import { AlertsModule } from "src/growth/alerts/alerts.module";
 
 describe("Alert Preferences (e2e)", () => {
   let app: INestApplication;

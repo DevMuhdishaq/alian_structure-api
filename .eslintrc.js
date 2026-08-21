@@ -16,7 +16,10 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['test/modules/**/*.ts'],
+      files: [
+        'test/modules/**/*.ts',
+        'test/alerts/alert-preferences.e2e-spec.ts',
+      ],
       parserOptions: {
         project: 'test/tsconfig.json',
       },
