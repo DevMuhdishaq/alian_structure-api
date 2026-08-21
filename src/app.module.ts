@@ -54,6 +54,8 @@ import { LoggerModule } from "./logging/logger.module";
 // Modules – cache
 import { CacheModule } from "./common/cache/cache.module";
 import { BillingModule } from "./billing/billing.module";
+// Modules – payments (plugin system)
+import { PaymentsModule } from "./payments/payments.module";
 
 // Auth entities
 import { User } from "./core/user/entities/user.entity";
@@ -253,6 +255,7 @@ import { GraphqlGatewayModule } from "./graphql/graphql.module";
       }),
     }),
     BillingModule,
+    PaymentsModule,
   ],
 
   controllers: [AppController],
