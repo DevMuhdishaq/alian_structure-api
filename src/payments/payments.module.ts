@@ -15,6 +15,7 @@ import { PaymentProcessorFactory } from "./payment-processor.factory";
 import { PaymentsController } from "./payments.controller";
 import { PaymentsService } from "./payments.service";
 import { PaymentProcessorRegistry } from "./registry/payment-processor.registry";
+import { StellarPaymentsController } from "./stellar-payments.controller";
 
 /**
  * Wires the payment-processor plugin system.
@@ -30,7 +31,11 @@ import { PaymentProcessorRegistry } from "./registry/payment-processor.registry"
  */
 @Module({
   imports: [ConfigModule, HttpModule, DiscoveryModule],
-  controllers: [PaymentsController],
+  // StellarPaymentsController MUST precede PaymentsController: its static
+  // `payments/stellar/{submit,status}` routes would otherwise be shadowed by the
+  // generic dynamic `payments/:id/{submit,status}` routes (Express matches in
+  // registration order). See the note in stellar-payments.controller.ts.
+  controllers: [StellarPaymentsController, PaymentsController],
   providers: [
     PaymentProcessorRegistry,
     PaymentProcessorFactory,
