@@ -15,13 +15,10 @@ import { timingSafeEqual } from "crypto";
 import { Public } from "../common/decorators/public.decorator";
 import { SkipKyc } from "../common/decorators/skip-kyc.decorator";
 import { RateLimiterService } from "./rate-limiter.service";
-import {
-  RateLimitStorage,
-  RateLimitEntry,
-} from "./interfaces";
-import { SetRateLimitDto, RateLimitResetDto, RateLimitStatusDto } from "./dto/rate-limit-dto";
+import { RateLimitStorage } from "./interfaces";
+import { SetRateLimitDto, RateLimitStatusDto } from "./dto/rate-limit-dto";
 import { register } from "../config/metrics";
-import { rateLimitAllowedTotal, rateLimitDeniedTotal, rateLimitErrorsTotal, rateLimitStorageHealth } from "./rate-limiting.metrics";
+import { rateLimitAllowedTotal, rateLimitDeniedTotal, rateLimitErrorsTotal } from "./rate-limiting.metrics";
 
 @ApiTags("Rate Limiting")
 @Controller("rate-limiting")
@@ -43,9 +40,9 @@ export class RateLimitingController {
 
     const storage = await this.rateLimiter.getStorageHealth();
     const entries = this.rateLimiter.listEntries(500);
-    const denied = await this.getMetricValue(rateLimitDeniedTotal);
-    const allowed = await this.getMetricValue(rateLimitAllowedTotal);
-    const errors = await this.getMetricValue(rateLimitErrorsTotal);
+    const denied = await this.getMetricValue(rateLimitDeniedTotal.name);
+    const allowed = await this.getMetricValue(rateLimitAllowedTotal.name);
+    const errors = await this.getMetricValue(rateLimitErrorsTotal.name);
 
     const deniedByTier: Record<string, number> = {};
     for (const entry of entries) {
@@ -214,14 +211,14 @@ export class RateLimitingController {
     return this.rateLimiter.getStorageHealth();
   }
 
-  private getMetricValue(
-    metric:
-      | import("prom-client").Counter<string>
-      | import("prom-client").Gauge<string>
-      | import("prom-client").Histogram<string>,
-  ): number {
-    const values = metric.values || [];
-    return values.reduce((sum, v) => sum + (v.value ?? 0), 0);
+  private async getMetricValue(metricName: string): Promise<number> {
+    const metrics = await register.getMetricsAsJSON();
+    const metric = metrics.find((m) => m.name === metricName);
+    if (!metric) return 0;
+    return metric.values.reduce(
+      (sum, v) => sum + (v.value ?? 0),
+      0,
+    );
   }
 
   private assertAuthorized(req: Request): void {

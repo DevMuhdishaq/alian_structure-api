@@ -20,6 +20,14 @@ export class SetRateLimitDto {
   @IsInt()
   @Min(1)
   burst?: number;
+
+  @IsOptional()
+  @IsString()
+  scope?: string;
+
+  @IsOptional()
+  @IsString()
+  tier?: string;
 }
 
 export class RateLimitResetDto {
@@ -35,6 +43,10 @@ export class RateLimitStatusDto {
   @IsOptional()
   @IsString()
   tracker?: string;
+
+  @IsOptional()
+  @IsString()
+  scope?: string;
 
   @IsOptional()
   @IsString()
