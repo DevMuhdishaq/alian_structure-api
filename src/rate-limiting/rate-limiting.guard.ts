@@ -17,11 +17,12 @@ import {
   normalizeRateLimitTier,
   resolveRateLimitTierFromRole,
 } from "../config/quota.config";
-import {
-  RateLimitStrategy,
-  RateLimitPolicy,
-} from "./interfaces";
+import { RateLimitStrategy } from "./interfaces";
 import { RateLimiterService } from "./rate-limiter.service";
+import {
+  rateLimitAllowedTotal,
+  rateLimitDeniedTotal,
+} from "./rate-limiting.metrics";
 
 interface ResolvedPolicy {
   tier: RateLimitTier;
@@ -141,9 +142,7 @@ export class DistributedRateLimitGuard implements CanActivate {
     };
   }
 
-  private resolveStrategy(
-    strategy?: RateLimitStrategy,
-  ): RateLimitStrategy {
+  private resolveStrategy(strategy?: RateLimitStrategy): RateLimitStrategy {
     if (strategy) return strategy;
 
     const envStrategy = String(

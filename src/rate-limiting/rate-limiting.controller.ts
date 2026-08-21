@@ -18,7 +18,10 @@ import { RateLimiterService } from "./rate-limiter.service";
 import { RateLimitStorage } from "./interfaces";
 import { SetRateLimitDto, RateLimitStatusDto } from "./dto/rate-limit-dto";
 import { register } from "../config/metrics";
-import { rateLimitAllowedTotal, rateLimitDeniedTotal, rateLimitErrorsTotal } from "./rate-limiting.metrics";
+
+const DENIED_METRIC = "alian_structure_rate_limit_denied_total";
+const ALLOWED_METRIC = "alian_structure_rate_limit_allowed_total";
+const ERRORS_METRIC = "alian_structure_rate_limit_errors_total";
 
 @ApiTags("Rate Limiting")
 @Controller("rate-limiting")
@@ -40,9 +43,9 @@ export class RateLimitingController {
 
     const storage = await this.rateLimiter.getStorageHealth();
     const entries = this.rateLimiter.listEntries(500);
-    const denied = await this.getMetricValue(rateLimitDeniedTotal.name);
-    const allowed = await this.getMetricValue(rateLimitAllowedTotal.name);
-    const errors = await this.getMetricValue(rateLimitErrorsTotal.name);
+    const denied = await this.getMetricValue(DENIED_METRIC);
+    const allowed = await this.getMetricValue(ALLOWED_METRIC);
+    const errors = await this.getMetricValue(ERRORS_METRIC);
 
     const deniedByTier: Record<string, number> = {};
     for (const entry of entries) {
@@ -108,9 +111,7 @@ export class RateLimitingController {
     let entries = this.rateLimiter.listEntries(query.limit);
 
     if (query.tracker) {
-      entries = entries.filter(
-        (e) => e.tracker === query.tracker,
-      );
+      entries = entries.filter((e) => e.tracker === query.tracker);
     }
     if (query.scope) {
       entries = entries.filter((e) => e.scope === query.scope);
@@ -215,10 +216,7 @@ export class RateLimitingController {
     const metrics = await register.getMetricsAsJSON();
     const metric = metrics.find((m) => m.name === metricName);
     if (!metric) return 0;
-    return metric.values.reduce(
-      (sum, v) => sum + (v.value ?? 0),
-      0,
-    );
+    return metric.values.reduce((sum, v) => sum + (v.value ?? 0), 0);
   }
 
   private assertAuthorized(req: Request): void {

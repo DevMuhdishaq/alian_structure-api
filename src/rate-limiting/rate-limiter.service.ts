@@ -1,6 +1,5 @@
 import { Inject, Injectable, Logger, Optional } from "@nestjs/common";
 import Redis from "ioredis";
-import { logger } from "../config/logger";
 import { CACHE_REDIS_CLIENT } from "../common/cache/cache.constants";
 import {
   RateLimitDecision,
@@ -9,7 +8,10 @@ import {
   RateLimitStorage,
   RateLimitStrategy,
 } from "./interfaces";
-import { rateLimitErrorsTotal, rateLimitStorageHealth } from "./rate-limiting.metrics";
+import {
+  rateLimitErrorsTotal,
+  rateLimitStorageHealth,
+} from "./rate-limiting.metrics";
 
 const TOKEN_BUCKET_LUA = `
 local key = KEYS[1]
@@ -143,14 +145,7 @@ export class RateLimiterService {
       decision = await this.consumeMemory(storageKey, resolvedPolicy);
     }
 
-    this.updateRegistry(
-      key,
-      tracker,
-      scope,
-      tier,
-      resolvedPolicy,
-      decision,
-    );
+    this.updateRegistry(key, tracker, scope, tier, resolvedPolicy, decision);
 
     return decision;
   }
@@ -191,9 +186,16 @@ export class RateLimiterService {
 
       let resetAt: number;
       if (policy.strategy === RateLimitStrategy.SlidingWindow) {
-        resetAt = retryAfterMs > 0 ? Date.now() + retryAfterMs : Date.now() + policy.windowMs;
+        resetAt =
+          retryAfterMs > 0
+            ? Date.now() + retryAfterMs
+            : Date.now() + policy.windowMs;
       } else {
-        resetAt = retryAfterMs > 0 ? Date.now() + retryAfterMs : Date.now() + Math.ceil((policy.burst - remaining) / ratePerSec * 1000);
+        resetAt =
+          retryAfterMs > 0
+            ? Date.now() + retryAfterMs
+            : Date.now() +
+              Math.ceil(((policy.burst - remaining) / ratePerSec) * 1000);
       }
 
       return {
@@ -238,7 +240,7 @@ export class RateLimiterService {
 
     if (state) {
       const elapsed = now - state.ts;
-      const refill = elapsed * ratePerSec / 1000;
+      const refill = (elapsed * ratePerSec) / 1000;
       tokens = Math.min(policy.burst, state.tokens + refill);
       ts = now;
     }
@@ -255,10 +257,10 @@ export class RateLimiterService {
     let resetAt = now;
 
     if (!allowed) {
-      retryAfterMs = Math.ceil((1 - tokens) / ratePerSec * 1000);
+      retryAfterMs = Math.ceil(((1 - tokens) / ratePerSec) * 1000);
       resetAt = now + retryAfterMs;
     } else {
-      resetAt = now + Math.ceil((policy.burst - tokens) / ratePerSec * 1000);
+      resetAt = now + Math.ceil(((policy.burst - tokens) / ratePerSec) * 1000);
     }
 
     return {

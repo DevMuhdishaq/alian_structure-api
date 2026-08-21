@@ -22,10 +22,9 @@ export class RateLimitingModule implements OnModuleInit {
             keyPrefix:
               configService.get<string>("RATE_LIMIT_REDIS_KEY_PREFIX") ??
               "alian:rl:",
-            defaultStrategy: (
-              configService.get<string>("RATE_LIMIT_DEFAULT_STRATEGY") ??
-              "token-bucket"
-            ) as RateLimitStrategy,
+            defaultStrategy: (configService.get<string>(
+              "RATE_LIMIT_DEFAULT_STRATEGY",
+            ) ?? "token-bucket") as RateLimitStrategy,
             enableFallback:
               configService.get<string>("RATE_LIMIT_FALLBACK_TO_MEMORY") !==
               "false",

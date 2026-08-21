@@ -203,9 +203,9 @@ import { GraphqlGatewayModule } from "./graphql/graphql.module";
             WebhookEvent,
             WebhookDelivery,
             WebhookDeadLetter,
-          UploadedFile,
-          FileThumbnail,
-          FileScanResult,
+            UploadedFile,
+            FileThumbnail,
+            FileScanResult,
           ],
           synchronize: true,
           logging: true,
@@ -269,10 +269,10 @@ import { GraphqlGatewayModule } from "./graphql/graphql.module";
       provide: APP_GUARD,
       useClass: StrategyAuthGuard,
     },
-     {
-       provide: APP_GUARD,
-       useClass: DistributedRateLimitGuard,
-     },
+    {
+      provide: APP_GUARD,
+      useClass: DistributedRateLimitGuard,
+    },
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
