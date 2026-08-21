@@ -53,6 +53,7 @@ import { LoggerModule } from "./logging/logger.module";
 // Modules – cache
 import { CacheModule } from "./common/cache/cache.module";
 import { BillingModule } from "./billing/billing.module";
+import { ReconciliationModule } from "./reconciliation/reconciliation.module";
 
 // Auth entities
 import { User } from "./core/user/entities/user.entity";
@@ -107,6 +108,10 @@ import { WebhookDeadLetter } from "./infrastructure/webhooks/entities/webhook-de
 import { UploadedFile } from "./infrastructure/file-upload/entities/uploaded-file.entity";
 import { FileThumbnail } from "./infrastructure/file-upload/entities/file-thumbnail.entity";
 import { FileScanResult } from "./infrastructure/file-upload/entities/file-scan-result.entity";
+// Reconciliation entities
+import { ReconciliationAudit } from "./reconciliation/entities/reconciliation-audit.entity";
+import { ReconciliationInvoice } from "./reconciliation/entities/reconciliation-invoice.entity";
+import { StellarTransaction } from "./reconciliation/entities/stellar-transaction.entity";
 // Modules – webhooks
 import { WebhookModule } from "./infrastructure/webhooks/webhook.module";
 // Modules – file upload
@@ -143,7 +148,7 @@ import { TenantModuleState } from "./modules/registry/entities/tenant-module-sta
           throw new Error(
             `Environment validation failed: ${errors
               .map((e) => Object.values(e.constraints || {}).join(", "))
-              .join(", ")}`,
+              .join(", ")}`
           );
         }
         return validatedConfig;
@@ -209,6 +214,9 @@ import { TenantModuleState } from "./modules/registry/entities/tenant-module-sta
             FileScanResult,
             ModuleEntity,
             TenantModuleState,
+            ReconciliationAudit,
+            ReconciliationInvoice,
+            StellarTransaction,
           ],
           synchronize: true,
           logging: true,
@@ -258,6 +266,7 @@ import { TenantModuleState } from "./modules/registry/entities/tenant-module-sta
       }),
     }),
     BillingModule,
+    ReconciliationModule,
   ],
 
   controllers: [AppController],
@@ -289,7 +298,7 @@ import { TenantModuleState } from "./modules/registry/entities/tenant-module-sta
 export class AppModule implements NestModule, OnModuleInit {
   constructor(
     @Inject(SubmissionVerifierService)
-    private readonly verifier: SubmissionVerifierService,
+    private readonly verifier: SubmissionVerifierService
   ) {}
 
   configure(consumer: MiddlewareConsumer) {
@@ -298,7 +307,7 @@ export class AppModule implements NestModule, OnModuleInit {
     consumer
       .apply(
         (req, res, next) => loggingMiddleware.use(req, res, next),
-        ProfilingMiddleware,
+        ProfilingMiddleware
       )
       .forRoutes("*");
   }
