@@ -54,6 +54,7 @@ import { LoggerModule } from "./logging/logger.module";
 // Modules – cache
 import { CacheModule } from "./common/cache/cache.module";
 import { BillingModule } from "./billing/billing.module";
+import { RateLimitingModule } from "./rate-limiting/rate-limiting.module";
 
 // Auth entities
 import { User } from "./core/user/entities/user.entity";
@@ -115,7 +116,7 @@ import { FileUploadModule } from "./infrastructure/file-upload/file-upload.modul
 
 // Guards
 import { APP_FILTER } from "@nestjs/core";
-import { QuotaGuard } from "./common/guard/quota.guard";
+import { DistributedRateLimitGuard } from "./rate-limiting/rate-limiting.guard";
 import { RolesGuard } from "./common/guard/roles.guard";
 import { KycGuard } from "./common/guard/kyc.guard";
 import { StrategyAuthGuard } from "./core/auth/guards/strategy-auth.guard";
@@ -240,6 +241,7 @@ import { GraphqlGatewayModule } from "./graphql/graphql.module";
     WebhookModule,
     FileUploadModule,
     CacheModule,
+    RateLimitingModule.forRoot(),
     LoggerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (cfg: ConfigService) => ({
@@ -267,10 +269,10 @@ import { GraphqlGatewayModule } from "./graphql/graphql.module";
       provide: APP_GUARD,
       useClass: StrategyAuthGuard,
     },
-    {
-      provide: APP_GUARD,
-      useClass: QuotaGuard,
-    },
+     {
+       provide: APP_GUARD,
+       useClass: DistributedRateLimitGuard,
+     },
     {
       provide: APP_GUARD,
       useClass: RolesGuard,

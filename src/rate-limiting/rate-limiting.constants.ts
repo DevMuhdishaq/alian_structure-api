@@ -1,5 +1,7 @@
 export const RATE_LIMITING_MODULE_OPTIONS = Symbol("RATE_LIMITING_MODULE_OPTIONS");
 
+export const RATE_LIMIT_CONFIG = "RATE_LIMIT_CONFIG";
+
 export const REDIS_RATE_LIMIT_CLIENT = Symbol("REDIS_RATE_LIMIT_CLIENT");
 
 export const RATE_LIMIT_KEY_PREFIX = "alian:ratelimit:";

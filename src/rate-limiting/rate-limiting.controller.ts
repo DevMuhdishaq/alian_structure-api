@@ -8,8 +8,6 @@ import {
   Query,
   Req,
   UnauthorizedException,
-  UseInterceptors,
-  UploadedFile,
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Request } from "express";
