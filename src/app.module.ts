@@ -37,7 +37,6 @@ import { DeFiModule } from "./defi/defi.module";
 
 // Modules – growth
 import { AlertsModule } from "./growth/alerts/alerts.module";
-import { DashboardModule } from "./dashboard/dashboard.module";
 
 // Modules – health
 import { HealthModule } from "./health/health.module";
@@ -205,11 +204,11 @@ import { TenantModuleState } from "./modules/registry/entities/tenant-module-sta
             WebhookEvent,
             WebhookDelivery,
             WebhookDeadLetter,
-          UploadedFile,
-          FileThumbnail,
-          FileScanResult,
-          ModuleEntity,
-          TenantModuleState,
+            UploadedFile,
+            FileThumbnail,
+            FileScanResult,
+            ModuleEntity,
+            TenantModuleState,
           ],
           synchronize: true,
           logging: true,
