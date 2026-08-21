@@ -37,7 +37,6 @@ import { DeFiModule } from "./defi/defi.module";
 
 // Modules – growth
 import { AlertsModule } from "./growth/alerts/alerts.module";
-import { DashboardModule } from "./dashboard/dashboard.module";
 
 // Modules – health
 import { HealthModule } from "./health/health.module";
@@ -129,6 +128,9 @@ import { SubmissionVerifierService } from "./blockchain/oracle/submission-verifi
 import { LoggingMiddleware } from "./common/middleware/logging.middleware";
 import { ProfilingMiddleware } from "./profiling/profiling.middleware";
 import { GraphqlGatewayModule } from "./graphql/graphql.module";
+import { ModuleRegistryModule } from "./modules/registry/module-registry.module";
+import { ModuleEntity } from "./modules/registry/entities/module.entity";
+import { TenantModuleState } from "./modules/registry/entities/tenant-module-state.entity";
 
 @Module({
   imports: [
@@ -210,6 +212,8 @@ import { GraphqlGatewayModule } from "./graphql/graphql.module";
             UploadedFile,
             FileThumbnail,
             FileScanResult,
+            ModuleEntity,
+            TenantModuleState,
             ReconciliationAudit,
             ReconciliationInvoice,
             StellarTransaction,
@@ -247,6 +251,7 @@ import { GraphqlGatewayModule } from "./graphql/graphql.module";
     GraphqlGatewayModule,
     WebhookModule,
     FileUploadModule,
+    ModuleRegistryModule,
     CacheModule,
     LoggerModule.forRootAsync({
       inject: [ConfigService],
