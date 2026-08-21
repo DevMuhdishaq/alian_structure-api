@@ -53,6 +53,7 @@ import { LoggerModule } from "./logging/logger.module";
 // Modules – cache
 import { CacheModule } from "./common/cache/cache.module";
 import { BillingModule } from "./billing/billing.module";
+import { RateLimitingModule } from "./rate-limiting/rate-limiting.module";
 import { ReconciliationModule } from "./reconciliation/reconciliation.module";
 
 // Auth entities
@@ -119,7 +120,7 @@ import { FileUploadModule } from "./infrastructure/file-upload/file-upload.modul
 
 // Guards
 import { APP_FILTER } from "@nestjs/core";
-import { QuotaGuard } from "./common/guard/quota.guard";
+import { DistributedRateLimitGuard } from "./rate-limiting/rate-limiting.guard";
 import { RolesGuard } from "./common/guard/roles.guard";
 import { KycGuard } from "./common/guard/kyc.guard";
 import { StrategyAuthGuard } from "./core/auth/guards/strategy-auth.guard";
@@ -253,6 +254,7 @@ import { TenantModuleState } from "./modules/registry/entities/tenant-module-sta
     FileUploadModule,
     ModuleRegistryModule,
     CacheModule,
+    RateLimitingModule.forRoot(),
     LoggerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (cfg: ConfigService) => ({
@@ -283,7 +285,7 @@ import { TenantModuleState } from "./modules/registry/entities/tenant-module-sta
     },
     {
       provide: APP_GUARD,
-      useClass: QuotaGuard,
+      useClass: DistributedRateLimitGuard,
     },
     {
       provide: APP_GUARD,
