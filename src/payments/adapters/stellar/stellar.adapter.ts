@@ -31,7 +31,7 @@ import {
   SignedTransaction,
   SubmittedTransaction,
 } from "../../interfaces/payment-processor.interface";
-import { STELLAR_HORIZON_SERVER } from "./stellar.constants";
+import { STELLAR_HORIZON_SERVER, STELLAR_PROCESSOR_NAME } from "./stellar.constants";
 
 /** Config accepted by {@link StellarAdapter.initialize}. */
 export interface StellarConfig {
@@ -61,7 +61,7 @@ export class StellarAdapter implements IPaymentProcessor<
   PaymentRequest,
   CreatedPayment
 > {
-  readonly name = "stellar";
+  readonly name = STELLAR_PROCESSOR_NAME;
   readonly displayName = "Stellar";
   readonly capabilities: PaymentCapabilities = {
     // Stellar has no native refund; we reverse the payment, and can send back a

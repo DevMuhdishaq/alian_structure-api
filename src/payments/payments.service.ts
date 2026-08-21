@@ -51,6 +51,21 @@ export class PaymentsService {
     return this.factory.resolve(selector).submitTransaction(signed);
   }
 
+  /**
+   * Convenience composition of sign + submit for server-side-signing processors
+   * (e.g. Stellar): resolve the processor once, sign the created payment, then
+   * submit the signed result. Backs the `/payments/stellar/submit` alias so a
+   * create → submit flow needs no separate client sign step.
+   */
+  async signAndSubmit(
+    created: CreatedPayment,
+    selector?: string,
+  ): Promise<SubmittedTransaction> {
+    const processor = this.factory.resolve(selector);
+    const signed = await processor.signTransaction(created);
+    return processor.submitTransaction(signed);
+  }
+
   getStatus(
     paymentId: string,
     selector?: string,
