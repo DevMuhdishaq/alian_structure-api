@@ -86,6 +86,33 @@ describe("ModuleRegistryService", () => {
     );
   });
 
+  it("rejects invalid semantic versions before loading lifecycle code", async () => {
+    await expect(service.register(registration("not-semver"))).rejects.toThrow(
+      "Invalid module manifest",
+    );
+  });
+
+  it("rejects invalid core semantic-version ranges", async () => {
+    await expect(
+      service.register(registration("0.1.0", "not-a-range")),
+    ).rejects.toThrow("Invalid module manifest");
+  });
+
+  it("rolls back registration when onInstall fails", async () => {
+    lifecycleLoader.bind("test/example-lifecycle", {
+      onInstall: jest.fn().mockRejectedValue(new Error("install failed")),
+      onUpgrade: jest.fn().mockResolvedValue(undefined),
+    });
+
+    await expect(service.register(registration())).rejects.toThrow(
+      "install failed",
+    );
+
+    expect(
+      await testingModule.get(DataSource).getRepository(ModuleEntity).count(),
+    ).toBe(0);
+  });
+
   it("enables and disables only the requested tenant state", async () => {
     lifecycleLoader.bind("test/example-lifecycle", {
       onInstall: jest.fn().mockResolvedValue(undefined),
@@ -113,6 +140,47 @@ describe("ModuleRegistryService", () => {
     expect((await service.findOne(registered.id)).status).toBe(
       ModuleStatus.ENABLED,
     );
+  });
+
+  it("resolves explicit tenant state before global and implicit defaults", async () => {
+    lifecycleLoader.bind("test/example-lifecycle", {
+      onInstall: jest.fn().mockResolvedValue(undefined),
+      onUpgrade: jest.fn().mockResolvedValue(undefined),
+    });
+    const registered = await service.register(registration());
+
+    await expect(
+      service.resolveTenantState(registered.id, "tenant-a"),
+    ).resolves.toEqual({
+      moduleId: registered.id,
+      tenantId: "tenant-a",
+      stateId: null,
+      enabled: false,
+      config: null,
+      source: "implicit",
+    });
+
+    await service.enable(registered.id, { config: { plan: "default" } });
+    const inherited = await service.resolveTenantState(
+      registered.id,
+      "tenant-a",
+    );
+    expect(inherited).toMatchObject({
+      enabled: true,
+      config: { plan: "default" },
+      source: "global",
+    });
+
+    await service.disable(registered.id, { tenantId: "tenant-a" });
+    const overridden = await service.resolveTenantState(
+      registered.id,
+      "tenant-a",
+    );
+    expect(overridden).toMatchObject({
+      enabled: false,
+      config: null,
+      source: "tenant",
+    });
   });
 
   it("rechecks core compatibility before enabling a registered module", async () => {
@@ -154,6 +222,7 @@ describe("ModuleRegistryService", () => {
       onUpgrade: jest.fn().mockResolvedValue(undefined),
     });
     const registered = await service.register(registration());
+    await service.enable(registered.id, {});
     lifecycleLoader.bind("test/example-lifecycle", {
       onInstall: jest.fn().mockResolvedValue(undefined),
       onUpgrade: jest.fn().mockRejectedValue(new Error("upgrade failed")),
@@ -163,7 +232,9 @@ describe("ModuleRegistryService", () => {
       "upgrade failed",
     );
 
-    expect((await service.findOne(registered.id)).version).toBe("0.1.0");
+    const rolledBack = await service.findOne(registered.id);
+    expect(rolledBack.version).toBe("0.1.0");
+    expect(rolledBack.status).toBe(ModuleStatus.ENABLED);
   });
 
   it("invokes onUninstall when deregistering a disabled module", async () => {
@@ -182,6 +253,43 @@ describe("ModuleRegistryService", () => {
     expect(lifecycle.onUninstall).toHaveBeenCalledTimes(1);
     await expect(service.findOne(registered.id)).rejects.toThrow(
       `Module ${registered.id} not found`,
+    );
+  });
+
+  it("keeps the module registered when onUninstall fails", async () => {
+    const lifecycle: ModuleLifecycle = {
+      onInstall: jest.fn().mockResolvedValue(undefined),
+      onUpgrade: jest.fn().mockResolvedValue(undefined),
+      onUninstall: jest.fn().mockResolvedValue(undefined),
+    };
+    lifecycleLoader.bind("test/example-lifecycle", lifecycle);
+    const dto = registration();
+    dto.manifest.hooks.onUninstall = true;
+    const registered = await service.register(dto);
+    lifecycleLoader.bind("test/example-lifecycle", {
+      ...lifecycle,
+      onUninstall: jest.fn().mockRejectedValue(new Error("uninstall failed")),
+    });
+
+    await expect(service.deregister(registered.id)).rejects.toThrow(
+      "uninstall failed",
+    );
+    await expect(service.findOne(registered.id)).resolves.toMatchObject({
+      id: registered.id,
+      version: "0.1.0",
+    });
+  });
+
+  it("does not deregister a module enabled for any tenant", async () => {
+    lifecycleLoader.bind("test/example-lifecycle", {
+      onInstall: jest.fn().mockResolvedValue(undefined),
+      onUpgrade: jest.fn().mockResolvedValue(undefined),
+    });
+    const registered = await service.register(registration());
+    await service.enable(registered.id, { tenantId: "tenant-a" });
+
+    await expect(service.deregister(registered.id)).rejects.toThrow(
+      "cannot be deregistered while enabled",
     );
   });
 });

@@ -1,19 +1,22 @@
-import manifest from "src/modules/example-grant-module/module.manifest.json";
+"use strict";
 
-interface RegistrationResponse {
-  module?: { id: string; name: string; version: string };
-  message?: string;
-}
+const manifest = require("./module.manifest.json");
 
-async function registerExampleModule(): Promise<void> {
+async function registerExampleModule() {
   const endpoint =
     process.env.MODULE_REGISTRY_URL ?? "http://localhost:3001/api/v1/modules";
   const token = process.env.MODULE_REGISTRY_TOKEN;
+  if (!token) {
+    throw new Error(
+      "MODULE_REGISTRY_TOKEN is required because module registration is admin-only",
+    );
+  }
+
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      ...(token ? { authorization: `Bearer ${token}` } : {}),
+      authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
       manifest,
@@ -22,7 +25,7 @@ async function registerExampleModule(): Promise<void> {
       author: "GrantFox example contributor",
     }),
   });
-  const body = (await response.json()) as RegistrationResponse;
+  const body = await response.json();
 
   if (!response.ok) {
     throw new Error(
@@ -35,7 +38,7 @@ async function registerExampleModule(): Promise<void> {
   );
 }
 
-registerExampleModule().catch((error: unknown) => {
+registerExampleModule().catch((error) => {
   const reason = error instanceof Error ? error.message : String(error);
   process.stderr.write(`${reason}\n`);
   process.exitCode = 1;

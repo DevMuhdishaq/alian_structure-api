@@ -55,7 +55,7 @@ export class ModuleManifestDto {
   hooks: ModuleManifestHooksDto;
 
   @ApiProperty({
-    example: "src/modules/example-grant-module/example-grant-module.lifecycle",
+    example: "modules/example-grant-module/index.cjs",
   })
   @IsString()
   @IsNotEmpty()
@@ -117,4 +117,16 @@ export class DisableModuleDto {
   @IsNotEmpty()
   @MaxLength(255)
   tenantId?: string;
+}
+
+export class ResolveModuleStateQueryDto {
+  @ApiProperty({
+    example: "tenant-123",
+    description:
+      "Tenant whose effective state should be resolved. An explicit tenant state overrides the global default.",
+  })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(255)
+  tenantId: string;
 }

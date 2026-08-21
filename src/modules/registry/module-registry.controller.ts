@@ -8,6 +8,7 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
 } from "@nestjs/common";
 import {
   ApiBearerAuth,
@@ -20,11 +21,19 @@ import {
   DisableModuleDto,
   EnableModuleDto,
   RegisterModuleDto,
+  ResolveModuleStateQueryDto,
 } from "src/modules/registry/dto/module-registry.dto";
 import { ModuleRegistryService } from "src/modules/registry/module-registry.service";
+import { Roles } from "src/common/guard/roles.decorator";
+import { Role } from "src/common/guard/roles.enum";
+import { SkipKyc } from "src/common/decorators/skip-kyc.decorator";
 
 @ApiTags("Modules")
 @ApiBearerAuth()
+@ApiResponse({ status: 401, description: "Authentication required" })
+@ApiResponse({ status: 403, description: "Administrator role required" })
+@Roles(Role.ADMIN)
+@SkipKyc()
 @Controller("modules")
 export class ModuleRegistryController {
   constructor(private readonly registryService: ModuleRegistryService) {}
@@ -47,6 +56,24 @@ export class ModuleRegistryController {
   @ApiOperation({ summary: "List registered modules and tenant states" })
   async findAll() {
     return { modules: await this.registryService.findAll() };
+  }
+
+  @Get(":id/state")
+  @ApiOperation({
+    summary: "Resolve a tenant's effective module state",
+    description:
+      "Returns the explicit tenant state when present, otherwise the global default, otherwise an implicit disabled state.",
+  })
+  @ApiParam({ name: "id", description: "Module UUID" })
+  @ApiResponse({ status: 200, description: "Effective module state" })
+  @ApiResponse({ status: 404, description: "Module not found" })
+  async resolveTenantState(
+    @Param("id", ParseUUIDPipe) id: string,
+    @Query() query: ResolveModuleStateQueryDto,
+  ) {
+    return {
+      state: await this.registryService.resolveTenantState(id, query.tenantId),
+    };
   }
 
   @Get(":id")

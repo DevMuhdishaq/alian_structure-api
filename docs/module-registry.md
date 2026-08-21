@@ -29,12 +29,19 @@ The schema requires:
 - `version`: valid semantic version.
 - `core`: semantic-version range supported by the module.
 - `hooks`: booleans declaring `onInstall`, `onUpgrade`, and `onUninstall`.
-- `entryPoint`: installed package reference or a local path inside the project.
+- `entryPoint`: installed package reference or a runtime JavaScript entry point
+  inside the root `modules/` directory. Local entry points outside that directory
+  are rejected so manifests cannot load core source files.
 
 The machine-readable schema is in
 `src/modules/registry/module-manifest.schema.json`. Runtime validation uses the
 equivalent class-validator DTO plus `semver`, so invalid versions and ranges are
 rejected even when a client does not use the JSON Schema.
+
+Local modules must expose JavaScript that Node can load without `ts-node`.
+TypeScript authors should compile their package before registration and ship
+declarations that implement `ModuleLifecycle`. Published npm package entry points
+are resolved normally from `node_modules`.
 
 The entry point must default-export a lifecycle class or object implementing:
 
@@ -52,6 +59,10 @@ version and status. Because external services cannot participate in the database
 transaction, hooks must be idempotent and compensate for external side effects.
 
 ## Register and upgrade
+
+Registry endpoints require an authenticated administrator. Registry management
+bypasses the general user KYC guard because it is an administrative control-plane
+operation; the global authentication and role guards still apply.
 
 POST the manifest and its metadata to `POST /api/v1/modules`:
 
@@ -99,22 +110,34 @@ caller. Omitting `tenantId` creates or updates the nullable global-default state
 it does not alter any explicit tenant row. An explicit tenant state therefore
 remains isolated from the default.
 
+Resolve the effective state for a tenant with:
+
+```text
+GET /api/v1/modules/:id/state?tenantId=tenant-123
+```
+
+Resolution uses the explicit tenant row first, then the global-default row. When
+neither exists the result is an implicit disabled state. A disabled explicit row
+therefore overrides an enabled global default.
+
 A module can be removed with `DELETE /api/v1/modules/:id` only when every tenant
 and global-default state is disabled. Deregistration runs `onUninstall` when it is
 declared.
 
 ## Run the example locally
 
-The working example is in `src/modules/example-grant-module`.
+The working example is in `modules/example-grant-module`. Its CommonJS entry
+point is loadable by the development server, the bundled application, and the
+production Docker image; `index.d.ts` declares the lifecycle TypeScript contract.
 
 ```bash
 npm install
 npm run migration:run
 npm run start:dev
-npm run module:example:register
+MODULE_REGISTRY_TOKEN=<admin-token> npm run module:example:register
 ```
 
-Set `MODULE_REGISTRY_TOKEN` when authentication is enabled and
+`MODULE_REGISTRY_TOKEN` must contain an administrator bearer token. Set
 `MODULE_REGISTRY_URL` to use a non-default API URL. Inspect the registered module
-with `GET /api/v1/modules`, then use its returned UUID in the enable and disable
-endpoints.
+with `GET /api/v1/modules`, then use its returned UUID in the enable, disable, and
+state-resolution endpoints.

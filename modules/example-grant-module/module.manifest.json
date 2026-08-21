@@ -7,5 +7,5 @@
     "onUpgrade": true,
     "onUninstall": false
   },
-  "entryPoint": "src/modules/example-grant-module/example-grant-module.lifecycle"
+  "entryPoint": "modules/example-grant-module/index.cjs"
 }

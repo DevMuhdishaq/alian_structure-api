@@ -22,6 +22,7 @@ import {
 import { TenantModuleState } from "src/modules/registry/entities/tenant-module-state.entity";
 import { ModuleLifecycleLoader } from "src/modules/registry/module-lifecycle.loader";
 import { ModuleManifestValidator } from "src/modules/registry/validation/module-manifest.validator";
+import { ResolvedModuleState } from "src/modules/registry/interfaces/resolved-module-state.interface";
 
 @Injectable()
 export class ModuleRegistryService {
@@ -118,6 +119,37 @@ export class ModuleRegistryService {
     }
 
     return registryModule;
+  }
+
+  async resolveTenantState(
+    id: string,
+    tenantId: string,
+  ): Promise<ResolvedModuleState> {
+    const registryModule = await this.moduleRepository.findOne({
+      where: { id },
+    });
+    if (!registryModule) {
+      throw new NotFoundException(`Module ${id} not found`);
+    }
+
+    const [tenantState, globalState] = await Promise.all([
+      this.tenantStateRepository.findOne({
+        where: { moduleId: id, tenantId },
+      }),
+      this.tenantStateRepository.findOne({
+        where: { moduleId: id, tenantId: IsNull() },
+      }),
+    ]);
+    const effectiveState = tenantState ?? globalState;
+
+    return {
+      moduleId: id,
+      tenantId,
+      stateId: effectiveState?.id ?? null,
+      enabled: effectiveState?.enabled ?? false,
+      config: effectiveState?.config ?? null,
+      source: tenantState ? "tenant" : globalState ? "global" : "implicit",
+    };
   }
 
   async enable(id: string, dto: EnableModuleDto): Promise<TenantModuleState> {

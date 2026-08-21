@@ -42,25 +42,33 @@ export class ModuleLifecycleLoader {
   }
 
   private resolveReference(entryPoint: string): string {
+    if (entryPoint.startsWith("src/")) {
+      throw new BadRequestException(
+        'Local module entry points must remain inside the project "modules" directory',
+      );
+    }
+
     const isLocalReference =
       entryPoint.startsWith(".") ||
       entryPoint.startsWith("/") ||
-      entryPoint.startsWith("src/");
+      entryPoint.startsWith("modules/");
 
     if (!isLocalReference) {
       return entryPoint;
     }
 
     const projectRoot = resolve(process.cwd());
+    const moduleRoot = resolve(projectRoot, "modules");
     const absoluteReference = resolve(projectRoot, entryPoint);
-    const relativeReference = relative(projectRoot, absoluteReference);
+    const relativeReference = relative(moduleRoot, absoluteReference);
 
     if (
       relativeReference.startsWith("..") ||
+      relativeReference === "" ||
       relativeReference.includes(`..${sep}`)
     ) {
       throw new BadRequestException(
-        "Local module entry points must remain inside the project directory",
+        'Local module entry points must remain inside the project "modules" directory',
       );
     }
 

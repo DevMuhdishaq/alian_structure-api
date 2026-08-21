@@ -1,14 +1,26 @@
 import { INestApplication } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { readFileSync } from "fs";
+import { resolve } from "path";
 import request from "supertest";
 import { DataSource } from "typeorm";
 import { createGlobalValidationPipe } from "src/common/pipes/validation.pipe";
-import { exampleGrantModuleEvents } from "src/modules/example-grant-module/example-grant-module.lifecycle";
-import manifest from "src/modules/example-grant-module/module.manifest.json";
 import { ModuleEntity } from "src/modules/registry/entities/module.entity";
 import { TenantModuleState } from "src/modules/registry/entities/tenant-module-state.entity";
+import { ModuleManifest } from "src/modules/registry/interfaces/module-manifest.interface";
 import { ModuleRegistryModule } from "src/modules/registry/module-registry.module";
+
+const manifest = JSON.parse(
+  readFileSync(
+    resolve(process.cwd(), "modules/example-grant-module/module.manifest.json"),
+    "utf8",
+  ),
+) as ModuleManifest;
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { exampleGrantModuleEvents } = require(
+  resolve(process.cwd(), manifest.entryPoint),
+) as { exampleGrantModuleEvents: string[] };
 
 describe("Module registry API (e2e)", () => {
   let app: INestApplication;
@@ -61,6 +73,21 @@ describe("Module registry API (e2e)", () => {
 
     await request(app.getHttpServer())
       .post(`/api/v1/modules/${moduleId}/enable`)
+      .send({ config: { plan: "default" } })
+      .expect(200);
+
+    await request(app.getHttpServer())
+      .get(`/api/v1/modules/${moduleId}/state`)
+      .query({ tenantId: "fallback-tenant" })
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.state.enabled).toBe(true);
+        expect(body.state.source).toBe("global");
+        expect(body.state.config).toEqual({ plan: "default" });
+      });
+
+    await request(app.getHttpServer())
+      .post(`/api/v1/modules/${moduleId}/enable`)
       .send({ tenantId: "example-tenant", config: { plan: "grant" } })
       .expect(200)
       .expect(({ body }) => {
@@ -87,6 +114,20 @@ describe("Module registry API (e2e)", () => {
       .expect(({ body }) => {
         expect(body.state.enabled).toBe(false);
       });
+
+    await request(app.getHttpServer())
+      .get(`/api/v1/modules/${moduleId}/state`)
+      .query({ tenantId: "example-tenant" })
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.state.enabled).toBe(false);
+        expect(body.state.source).toBe("tenant");
+      });
+
+    await request(app.getHttpServer())
+      .post(`/api/v1/modules/${moduleId}/disable`)
+      .send({})
+      .expect(200);
 
     await request(app.getHttpServer())
       .get(`/api/v1/modules/${moduleId}`)

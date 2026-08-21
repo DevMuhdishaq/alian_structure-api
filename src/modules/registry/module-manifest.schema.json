@@ -14,11 +14,14 @@
     },
     "version": {
       "type": "string",
+      "format": "semver",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$",
       "description": "Semantic version"
     },
     "core": {
       "type": "string",
       "minLength": 1,
+      "format": "semver-range",
       "description": "Supported core semantic-version range"
     },
     "hooks": {
