@@ -569,4 +569,27 @@ export class EnvironmentVariables {
   @IsOptional()
   @IsString()
   GRANTFOX_API_KEY?: string;
+  // Rate Limiting & Abuse Protection (distributed, Redis-backed)
+
+  /** Redis key prefix for rate-limit entries. Default: "alian:rl:". */
+  @IsOptional()
+  @IsString()
+  RATE_LIMIT_REDIS_KEY_PREFIX?: string = "alian:rl:";
+
+  /**
+   * Default rate-limiting strategy: "token-bucket" (default) or
+   * "sliding-window".
+   */
+  @IsOptional()
+  @IsString()
+  RATE_LIMIT_DEFAULT_STRATEGY?: string = "token-bucket";
+
+  /**
+   * When "false", the rate limiter will reject requests (rather than fall back
+   * to in-memory) if Redis is unavailable. Default: true.
+   */
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => value !== "false")
+  RATE_LIMIT_FALLBACK_TO_MEMORY?: boolean = true;
 }

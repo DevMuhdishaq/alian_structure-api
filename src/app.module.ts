@@ -37,7 +37,6 @@ import { DeFiModule } from "./defi/defi.module";
 
 // Modules – growth
 import { AlertsModule } from "./growth/alerts/alerts.module";
-import { DashboardModule } from "./dashboard/dashboard.module";
 
 // Modules – health
 import { HealthModule } from "./health/health.module";
@@ -56,6 +55,8 @@ import { CacheModule } from "./common/cache/cache.module";
 import { BillingModule } from "./billing/billing.module";
 // Modules – payments (plugin system)
 import { PaymentsModule } from "./payments/payments.module";
+import { RateLimitingModule } from "./rate-limiting/rate-limiting.module";
+import { ReconciliationModule } from "./reconciliation/reconciliation.module";
 
 // Auth entities
 import { User } from "./core/user/entities/user.entity";
@@ -110,6 +111,10 @@ import { WebhookDeadLetter } from "./infrastructure/webhooks/entities/webhook-de
 import { UploadedFile } from "./infrastructure/file-upload/entities/uploaded-file.entity";
 import { FileThumbnail } from "./infrastructure/file-upload/entities/file-thumbnail.entity";
 import { FileScanResult } from "./infrastructure/file-upload/entities/file-scan-result.entity";
+// Reconciliation entities
+import { ReconciliationAudit } from "./reconciliation/entities/reconciliation-audit.entity";
+import { ReconciliationInvoice } from "./reconciliation/entities/reconciliation-invoice.entity";
+import { StellarTransaction } from "./reconciliation/entities/stellar-transaction.entity";
 // Modules – webhooks
 import { WebhookModule } from "./infrastructure/webhooks/webhook.module";
 // Modules – file upload
@@ -117,7 +122,7 @@ import { FileUploadModule } from "./infrastructure/file-upload/file-upload.modul
 
 // Guards
 import { APP_FILTER } from "@nestjs/core";
-import { QuotaGuard } from "./common/guard/quota.guard";
+import { DistributedRateLimitGuard } from "./rate-limiting/rate-limiting.guard";
 import { RolesGuard } from "./common/guard/roles.guard";
 import { KycGuard } from "./common/guard/kyc.guard";
 import { StrategyAuthGuard } from "./core/auth/guards/strategy-auth.guard";
@@ -126,6 +131,9 @@ import { SubmissionVerifierService } from "./blockchain/oracle/submission-verifi
 import { LoggingMiddleware } from "./common/middleware/logging.middleware";
 import { ProfilingMiddleware } from "./profiling/profiling.middleware";
 import { GraphqlGatewayModule } from "./graphql/graphql.module";
+import { ModuleRegistryModule } from "./modules/registry/module-registry.module";
+import { ModuleEntity } from "./modules/registry/entities/module.entity";
+import { TenantModuleState } from "./modules/registry/entities/tenant-module-state.entity";
 
 @Module({
   imports: [
@@ -143,7 +151,7 @@ import { GraphqlGatewayModule } from "./graphql/graphql.module";
           throw new Error(
             `Environment validation failed: ${errors
               .map((e) => Object.values(e.constraints || {}).join(", "))
-              .join(", ")}`,
+              .join(", ")}`
           );
         }
         return validatedConfig;
@@ -204,9 +212,14 @@ import { GraphqlGatewayModule } from "./graphql/graphql.module";
             WebhookEvent,
             WebhookDelivery,
             WebhookDeadLetter,
-          UploadedFile,
-          FileThumbnail,
-          FileScanResult,
+            UploadedFile,
+            FileThumbnail,
+            FileScanResult,
+            ModuleEntity,
+            TenantModuleState,
+            ReconciliationAudit,
+            ReconciliationInvoice,
+            StellarTransaction,
           ],
           synchronize: true,
           logging: true,
@@ -241,7 +254,9 @@ import { GraphqlGatewayModule } from "./graphql/graphql.module";
     GraphqlGatewayModule,
     WebhookModule,
     FileUploadModule,
+    ModuleRegistryModule,
     CacheModule,
+    RateLimitingModule.forRoot(),
     LoggerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (cfg: ConfigService) => ({
@@ -256,6 +271,7 @@ import { GraphqlGatewayModule } from "./graphql/graphql.module";
     }),
     BillingModule,
     PaymentsModule,
+    ReconciliationModule,
   ],
 
   controllers: [AppController],
@@ -272,7 +288,7 @@ import { GraphqlGatewayModule } from "./graphql/graphql.module";
     },
     {
       provide: APP_GUARD,
-      useClass: QuotaGuard,
+      useClass: DistributedRateLimitGuard,
     },
     {
       provide: APP_GUARD,
@@ -287,7 +303,7 @@ import { GraphqlGatewayModule } from "./graphql/graphql.module";
 export class AppModule implements NestModule, OnModuleInit {
   constructor(
     @Inject(SubmissionVerifierService)
-    private readonly verifier: SubmissionVerifierService,
+    private readonly verifier: SubmissionVerifierService
   ) {}
 
   configure(consumer: MiddlewareConsumer) {
@@ -296,7 +312,7 @@ export class AppModule implements NestModule, OnModuleInit {
     consumer
       .apply(
         (req, res, next) => loggingMiddleware.use(req, res, next),
-        ProfilingMiddleware,
+        ProfilingMiddleware
       )
       .forRoutes("*");
   }
