@@ -144,6 +144,11 @@ import { ModuleRegistryModule } from "./modules/registry/module-registry.module"
 import { ModuleEntity } from "./modules/registry/entities/module.entity";
 import { TenantModuleState } from "./modules/registry/entities/tenant-module-state.entity";
 
+// Modules – upgradeability
+import { UpgradeabilityModule } from "./modules/upgradeability/upgradeability.module";
+import { UpgradeRecord } from "./modules/upgradeability/entities/upgrade-record.entity";
+import { ImplementationVersion } from "./modules/upgradeability/entities/implementation-version.entity";
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -226,6 +231,8 @@ import { TenantModuleState } from "./modules/registry/entities/tenant-module-sta
             FileScanResult,
             ModuleEntity,
             TenantModuleState,
+            UpgradeRecord,
+            ImplementationVersion,
             ReconciliationAudit,
             ReconciliationInvoice,
             StellarTransaction,
@@ -270,6 +277,7 @@ import { TenantModuleState } from "./modules/registry/entities/tenant-module-sta
     WebhookModule,
     FileUploadModule,
     ModuleRegistryModule,
+    UpgradeabilityModule,
     CacheModule,
     RateLimitingModule.forRoot(),
     LoggerModule.forRootAsync({
